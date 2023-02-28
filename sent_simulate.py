@@ -106,12 +106,12 @@ for s in range(N_SCENARIOS):
         proxies_arr.append(proxy)
 
     #Obtain bernoulli draws         
-    draws = stats.bernoulli.rvs(bern_probs,size=len(bern_probs))
+    flips = stats.bernoulli.rvs(bern_probs,size=len(bern_probs))
     
     #Store bernoulli draw results        
     for ii in range(0,num_proxies):
         proxy = proxies_arr[ii]  
-        has_proxy = draws[ii]
+        has_proxy = flips[ii]
         if proxy in hc_proxies:
             score = HC_WEIGHT*has_proxy
         else:

@@ -7,6 +7,14 @@ import warnings
 import user_inputs
 import pickle
 
+## Updated MHR 2/26/23 for debugging 
+import re
+import copy
+from sent_simulate_fn_file import *
+from wr_simulate_fn_file import *
+
+
+
 warnings.filterwarnings('ignore')
 
 WR_SPECIES = ['pigs', 'chickens', 'carp', 'salmon', 'octopuses', 'shrimp', 'crabs', 'crayfish', 'bees', 'bsf', 'silkworms']
@@ -28,20 +36,29 @@ sent_default_unknowns = {'bees': 0, 'cockroaches': 0, 'fruit_flies': 0, 'ants':0
             'carp': 0, 'salmon': 0, 'silkworms': 0, 'pigs': 0}
 
 ## Sentience 
+## Updated MHR 2/26/23 for debugging
 print("For the PROBABILITY OF SENTIENCE...")
-s_unknowns = user_inputs.assign_unknowns(SENT_SPECIES, sent_default_unknowns)
-s_weight_nos = user_inputs.choose_nonzero_nos("sentience")
-s_hc_weight = user_inputs.choose_hc_weight("sentience")
+## s_unknowns = user_inputs.assign_unknowns(SENT_SPECIES, sent_default_unknowns)
+## s_weight_nos = user_inputs.choose_nonzero_nos("sentience")
+## s_hc_weight = user_inputs.choose_hc_weight("sentience")
+s_unknowns   = copy.deepcopy(sent_default_unknowns)
+s_weight_nos = "Yes"
+s_hc_weight  = 5
 
 S_PARAMS = {'N_SCENARIOS': 10000, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": s_weight_nos, "HC_WEIGHT": s_hc_weight}
 
 ## Welfare Ranges 
+## Updated MHR 2/26/23 for debugging
 print("For the WELFARE RANGES...")
-wr_unknowns = user_inputs.assign_unknowns(WR_SPECIES, wr_default_unknowns)
-wr_weight_nos = user_inputs.choose_nonzero_nos("welfare ranges")
-wr_hc_weight = user_inputs.choose_hc_weight("welfare ranges")
+##wr_unknowns = user_inputs.assign_unknowns(WR_SPECIES, wr_default_unknowns)
+##wr_weight_nos = user_inputs.choose_nonzero_nos("welfare ranges")
+##wr_hc_weight = user_inputs.choose_hc_weight("welfare ranges")
 
-WR_PARAMS = {'N_SCENARIOS': 10000, 'UPDATE_EVERY': 100, "WEIGHT_NOS": wr_weight_nos, "HC_WEIGHT": wr_hc_weight}
+wr_unknowns   = copy.deepcopy(wr_default_unknowns)
+wr_weight_nos = "Yes"
+wr_hc_weight  = 5
+
+WR_PARAMS = {'N_SCENARIOS': 10000, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": wr_weight_nos, "HC_WEIGHT": wr_hc_weight}
 
 def run_cmd(cmd):
     print(cmd)
@@ -56,13 +73,24 @@ def simulate_scores(species, params, s_or_wr):
     if s_or_wr == "sentience":
         params['path'] = "sent_{}".format(species)
         params['unknown_prob'] = s_unknowns[species]
-        run_cmd('python3 sent_simulate.py --species {species} --unknown_prob {unknown_prob} --weight_no {WEIGHT_NOS} --hc_weight {HC_WEIGHT} --scenarios {N_SCENARIOS} \
-            --csv output_data/scores_{path}.csv --path "output_data/{path}_" --update_every {UPDATE_EVERY}'.format(**params))
+        #run_cmd('python3 sent_simulate.py --species {species} --unknown_prob {unknown_prob} --weight_no {WEIGHT_NOS} --hc_weight {HC_WEIGHT} --scenarios {N_SCENARIOS} \
+        #    --csv output_data/scores_{path}.csv --path "output_data/{path}_" --update_every {UPDATE_EVERY}'.format(**params))
+        params['path']
+        sent_simulate_fn(params['species'],params['unknown_prob'],params['WEIGHT_NOS'],\
+                         params['HC_WEIGHT'],params['N_SCENARIOS'],False,\
+                             'output_data/scores_'+params['path'],True,'output_data/'+params['path']+"_",\
+                                 params['UPDATE_EVERY'])
     else:
         params['path'] = "wr_{}".format(species)
         params['unknown_prob'] = wr_unknowns[species]
-        run_cmd('python3 wr_simulate.py --species {species} --unknown_prob {unknown_prob} --weight_no {WEIGHT_NOS} --hc_weight {HC_WEIGHT} --scenarios {N_SCENARIOS} \
-            --csv output_data/scores_{path}.csv --path "output_data/{path}_" --update_every {UPDATE_EVERY}'.format(**params))
+        #run_cmd('python3 wr_simulate.py --species {species} --unknown_prob {unknown_prob} --weight_no {WEIGHT_NOS} --hc_weight {HC_WEIGHT} --scenarios {N_SCENARIOS} \
+        #    --csv output_data/scores_{path}.csv --path "output_data/{path}_" --update_every {UPDATE_EVERY}'.format(**params))
+        wr_simulate_fn(params['species'],params['unknown_prob'],params['WEIGHT_NOS'],\
+                         params['HC_WEIGHT'],params['N_SCENARIOS'],False,\
+                             'output_data/scores_'+params['path'],True,'output_data/'+params['path']+"_",\
+                                 params['UPDATE_EVERY'])
+
+
 
 if platform.system() == 'Darwin' or platform.system() == 'Linux':
     run_cmd('rm -rf output_data')
@@ -84,6 +112,8 @@ for species in SENT_SPECIES:
 for species in WR_SPECIES:
     simulate_scores(species, S_PARAMS, "welfare ranges")
 
+#Updated MHR 2/26/23 for debugging 
+"""
 print('...Launching sentience notebook')
 if platform.system() == 'Darwin' or platform.system() == 'Linux':
     run_cmd('jupyter notebook "sentience_models.ipynb"') 
@@ -99,4 +129,4 @@ elif platform.system() == 'Windows':
     run_cmd('python -m notebook "wr_models.ipynb"') 
 else:
     raise ValueError('Platform `{}` not supported'.format(platform.system()))
-
+"""
