@@ -111,9 +111,6 @@ def sent_simulate_fn(SPECIES,UNKNOWN_PROB,WEIGHT_NO,HC_WEIGHT,N_SCENARIOS,VERBOS
             simulated_probs[proxy].append(proxy_prob)
             simulated_scores[proxy].append(score)
             
-            
-    print(len(simulated_scores))
-    
     if SAVE:
         print('... Saving 1/1')
         pickle.dump(simulated_scores, open('{}simulated_scores.p'.format(PATH), 'wb'))
