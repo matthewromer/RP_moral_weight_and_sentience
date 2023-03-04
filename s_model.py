@@ -192,7 +192,7 @@ def get_overlap(criterion_proxies, species_scores):
 
     return criterion_scores
 
-def one_species_birch_sum(birch_proxies, species_scores,NUM_SCENARIOS):
+def one_species_birch_sum(birch_proxies, species_scores, NUM_SCENARIOS):
     birch_sums = {}
     for criterion in birch_proxies.columns:
         birch_sums[criterion] = []

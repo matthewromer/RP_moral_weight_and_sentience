@@ -1,20 +1,12 @@
 import os
 import pickle
 import random
-import argparse
 import csv
-
-import numpy as np
 import pandas as pd
-import squigglepy as sq
-
-from datetime import date
-from email.policy import default
 from scipy import stats
-from pprint import pprint
-from functools import partial
-from collections import defaultdict
+
 ## Generates the simulated data for each species' sentience proxies
+
 def sent_simulate_fn(SPECIES,UNKNOWN_PROB,WEIGHT_NO,HC_WEIGHT,N_SCENARIOS,VERBOSE,CSV,SAVE,PATH,update_every):
 
     '''
@@ -31,7 +23,6 @@ def sent_simulate_fn(SPECIES,UNKNOWN_PROB,WEIGHT_NO,HC_WEIGHT,N_SCENARIOS,VERBOS
     parser.add_argument('--verbose', type=bool, help='Set to True to get scenario-specific output', default=False)
     args = parser.parse_args()
     '''
-    
     SCENARIO_RANGES = [1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99]  # Generate printed output for these percentiles
     
     judgments = pd.read_csv(os.path.join('input_data', 'Sentience Judgments.csv'))

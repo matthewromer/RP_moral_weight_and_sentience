@@ -2,19 +2,9 @@
 import os
 import pickle
 import random
-import argparse
 import csv
-
-import numpy as np
 import pandas as pd
-import squigglepy as sq
-
-from datetime import date
-from email.policy import default
 from scipy import stats
-from pprint import pprint
-from functools import partial
-from collections import defaultdict
 
 def wr_simulate_fn(SPECIES,UNKNOWN_PROB,WEIGHT_NO,HC_WEIGHT,N_SCENARIOS,VERBOSE,CSV,SAVE,PATH,update_every):
     
