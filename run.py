@@ -41,13 +41,24 @@ sent_default_unknowns = {'bees': 0, 'cockroaches': 0, 'fruit_flies': 0, 'ants':0
             'cows': 0, 'sometimes_operates': 0, 'bsf': 0, \
             'carp': 0, 'salmon': 0, 'silkworms': 0, 'pigs': 0}
 
+fff =   {'pigs': 75, 
+            'chickens':50,
+            'carp': 72,
+            'salmon': 72,
+            'octopuses': 45,
+            'shrimp':  80, 
+            'crabs': 14, 
+            'crayfish':  55,
+            'bees': 110, 
+            'bsf':  None, 
+            'silkworms': None}
 ## Sentience 
 print("For the PROBABILITY OF SENTIENCE...")
 s_unknowns   = copy.deepcopy(sent_default_unknowns)
 s_weight_nos = "Yes"
 s_hc_weight  = 5
 
-S_PARAMS = {'N_SCENARIOS': 10000, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": s_weight_nos, "HC_WEIGHT": s_hc_weight}
+S_PARAMS = {'N_SCENARIOS': 200, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": s_weight_nos, "HC_WEIGHT": s_hc_weight}
 
 ## Welfare Ranges 
 print("For the WELFARE RANGES...")
@@ -55,8 +66,7 @@ wr_unknowns   = copy.deepcopy(wr_default_unknowns)
 wr_weight_nos = "Yes"
 wr_hc_weight  = 5
 
-WR_PARAMS = {'N_SCENARIOS': 10000, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": wr_weight_nos, "HC_WEIGHT": wr_hc_weight}
-
+WR_PARAMS = {'N_SCENARIOS': 200, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": wr_weight_nos, "HC_WEIGHT": wr_hc_weight}
 
 
 def simulate_scores(species, params, s_or_wr):
@@ -68,104 +78,53 @@ def simulate_scores(species, params, s_or_wr):
     if s_or_wr == "sentience":
         params['path'] = "sent_{}".format(species)
         params['unknown_prob'] = s_unknowns[species]
-        sent_simulate_fn(params['species'],params['unknown_prob'],params['WEIGHT_NOS'],\
+        simulated_scores = sent_simulate_fn(params['species'],params['unknown_prob'],params['WEIGHT_NOS'],\
                          params['HC_WEIGHT'],params['N_SCENARIOS'],False,\
                         'output_data/scores_'+params['path'],True,'output_data/'+params['path']+"_",\
                          params['UPDATE_EVERY'])
     else:
         params['path'] = "wr_{}".format(species)
         params['unknown_prob'] = wr_unknowns[species]
-        wr_simulate_fn(params['species'],params['unknown_prob'],params['WEIGHT_NOS'],\
+        simulated_scores = wr_simulate_fn(params['species'],params['unknown_prob'],params['WEIGHT_NOS'],\
                          params['HC_WEIGHT'],params['N_SCENARIOS'],False,\
                          'output_data/scores_'+params['path'],True,'output_data/'+params['path']+"_",\
                          params['UPDATE_EVERY'])
-
-
+    return simulated_scores
 
 sim_utils.clear_make_dir('output_data')
 
-pickle.dump(s_unknowns, open(os.path.join('input_data', 'Sentience Unknown Probabilities.p'), 'wb'))
-pickle.dump(S_PARAMS, open(os.path.join('input_data', 'Sentience Parameters.p'), 'wb'))
-pickle.dump(wr_unknowns, open(os.path.join('input_data', 'Welfare Range Unknown Probabilities.p'), 'wb'))
-pickle.dump(WR_PARAMS, open(os.path.join('input_data', 'Welfare Range Parameters.p'), 'wb'))
-
+data_sent = {}
+data_wr = {}
 for species in SENT_SPECIES:
-    simulate_scores(species, S_PARAMS, "sentience")
+    simulated_scores = simulate_scores(species, S_PARAMS, "sentience")
+    data_sent[species] = {'Scores': simulated_scores, 'Unknown Prob': s_unknowns[species]}
 
 for species in WR_SPECIES:
-    simulate_scores(species, S_PARAMS, "welfare ranges")
+    simulated_scores = simulate_scores(species, S_PARAMS, "welfare ranges")
+    data_wr[species] = {'Scores': simulated_scores, 'FFF': fff[species], 'Unknown Prob': wr_unknowns[species]}
+    
     
 ################## Sentience Computation ################## 
 
-### Import Data from Simulations
-
-warnings.filterwarnings('ignore')
 plt.rcParams['figure.figsize'] = (18.5 * 0.65, 10.5 * 0.65)
 
 SCENARIO_RANGES = [1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99]
 
-params = pickle.load(open(os.path.join('input_data', "Sentience Parameters.p"), 'rb'))
-NUM_SCENARIOS = params['N_SCENARIOS']
-HC_WEIGHT = params['HC_WEIGHT']
-WEIGHT_NOS = params['WEIGHT_NOS']
+NUM_SCENARIOS = S_PARAMS['N_SCENARIOS']
+HC_WEIGHT = S_PARAMS['HC_WEIGHT']
+WEIGHT_NOS = S_PARAMS['WEIGHT_NOS']
 
-SPECIES = ['bees', 'cockroaches', 'fruit_flies', 'ants', \
-            'c_elegans', 'crabs', 'crayfish', 'earthworms', \
-            'sea_hares', 'spiders', 'octopuses', 'chickens', \
-            'cows', 'sometimes_operates', 'bsf', \
-            'carp', 'salmon', 'silkworms', 'pigs']
-    
-    
-# import simulated scores
-bee_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_bees")), 'rb'))
-cockroach_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_cockroaches")), 'rb'))
-fruit_fly_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_fruit_flies")), 'rb'))
-ants_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_ants")), 'rb'))
-c_elegans_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_c_elegans")), 'rb'))
-crab_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_crabs")), 'rb'))
-crayfish_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_crayfish")), 'rb'))
-carp_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_carp")), 'rb'))
-earthworm_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_earthworms")), 'rb'))
-sea_hare_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_sea_hares")), 'rb'))
-spiders_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_spiders")), 'rb'))
-octopus_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_octopuses")), 'rb'))
-chicken_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_chickens")), 'rb'))
-cow_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_cows")), 'rb'))
-sometimes_operates_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_sometimes_operates")), 'rb'))
-bsf_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_bsf")), 'rb'))
-salmon_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_salmon")), 'rb'))
-silkworm_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_silkworms")), 'rb'))
-pig_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "sent_pigs")), 'rb'))
+SPECIES = SENT_SPECIES
 
-unknown_probabilities = pickle.load(open(os.path.join('input_data', "Sentience Unknown Probabilities.p"), 'rb'))
+sometimes_operates_scores = data_sent['sometimes_operates']['Scores']
 
 
 sim_utils.clear_make_dir('sentience_estimates')
 
 
-data = {'bees': {'Scores': bee_scores, 'Unknown Prob': unknown_probabilities['bees']}, 
-        'cockroaches': {'Scores': cockroach_scores, 'Unknown Prob': unknown_probabilities['cockroaches']}, 
-        'fruit_flies': {'Scores': fruit_fly_scores, 'Unknown Prob': unknown_probabilities['fruit_flies']}, 
-        'ants': {'Scores': ants_scores, 'Unknown Prob': unknown_probabilities['ants']},
-        'c_elegans': {'Scores': c_elegans_scores, 'Unknown Prob': unknown_probabilities['c_elegans']}, 
-        'crabs': {'Scores': crab_scores, 'Unknown Prob': unknown_probabilities['crabs']}, 
-        'crayfish': {'Scores': crayfish_scores, 'Unknown Prob': unknown_probabilities['crayfish']}, 
-        'earthworms': {'Scores': earthworm_scores, 'Unknown Prob': unknown_probabilities['earthworms']},
-        'sea_hares': {'Scores': sea_hare_scores, 'Unknown Prob': unknown_probabilities['sea_hares']}, 
-        'spiders': {'Scores': spiders_scores, 'Unknown Prob': unknown_probabilities['spiders']},
-        'octopuses': {'Scores': octopus_scores, 'Unknown Prob': unknown_probabilities['octopuses']},
-        'chickens': {'Scores': chicken_scores, 'Unknown Prob': unknown_probabilities['chickens']},
-        'cows': {'Scores': cow_scores, 'Unknown Prob': unknown_probabilities['cows']},
-        'sometimes_operates': {'Scores': sometimes_operates_scores, 'Unknown Prob': unknown_probabilities['sometimes_operates']},
-        'bsf': {'Scores': bsf_scores, 'Unknown Prob': unknown_probabilities['bsf']},
-        'carp': {'Scores': carp_scores, 'Unknown Prob': unknown_probabilities['carp']},
-        'salmon': {'Scores': salmon_scores, 'Unknown Prob': unknown_probabilities['salmon']},
-        'silkworms': {'Scores': silkworm_scores, 'Unknown Prob': unknown_probabilities['silkworms']},
-        'pigs': {'Scores': pig_scores, 'Unknown Prob': unknown_probabilities['pigs']},
-        }
 
 print("### Testing to make sure score generation works ###")
-result = test_simulations.test_sentience_scores(data, HC_WEIGHT, SPECIES)
+result = test_simulations.test_sentience_scores(data_sent, HC_WEIGHT, SPECIES)
 print(result)
 
 ### Make Subsets of Proxies for Each Model
@@ -205,7 +164,7 @@ else:
 
 print("Proxies we're higly confident matter for sentience are given", HC_WEIGHT, "x the weight of other proxies.")
 
-unknowns_df = s_model.unknown_probs_df(SPECIES,data)
+unknowns_df = s_model.unknown_probs_df(SPECIES,data_sent)
 
 # Priors-Based Scoring
 
@@ -318,25 +277,25 @@ print(priors_df)
 priors_df.to_csv(os.path.join('sentience_estimates', "Priors Sentience Summary Statistics.csv"), index_label="Species")
 
 # Simple Scoring
-ss_sent_stats, ss_sent_data = s_model.all_species_p_sentience_priors_based(s_model.ss_f, priors, "simple scoring", data, ss_proxies, SENT_SPECIES, NUM_SCENARIOS, sometimes_operates_scores, SCENARIO_RANGES, to_plot=False)
+ss_sent_stats, ss_sent_data = s_model.all_species_p_sentience_priors_based(s_model.ss_f, priors, "simple scoring", data_sent, ss_proxies, SENT_SPECIES, NUM_SCENARIOS, sometimes_operates_scores, SCENARIO_RANGES, to_plot=False)
 print("Simple Scoring Model:")
 print(ss_sent_stats)
 s_model.box_plot_adj_wr("Simple Scoring", ss_sent_data, species_caps, showfliers=True)
 
 ### #1 High Value Proxies 
-hv1_sent_stats, hv1_sent_data = s_model.all_species_p_sentience_priors_based(s_model.hv1_f, priors, "#1_high value proxies", data, hv1_proxies, SENT_SPECIES, NUM_SCENARIOS, sometimes_operates_scores, SCENARIO_RANGES, to_plot=False)
+hv1_sent_stats, hv1_sent_data = s_model.all_species_p_sentience_priors_based(s_model.hv1_f, priors, "#1_high value proxies", data_sent, hv1_proxies, SENT_SPECIES, NUM_SCENARIOS, sometimes_operates_scores, SCENARIO_RANGES, to_plot=False)
 print("#1 High-Value Proxies Model:")
 print(hv1_sent_stats)
 s_model.box_plot_adj_wr("#1 High-Value Proxies", hv1_sent_data, species_caps)
 
 ## Martina's High-Value Proxies
-hvm_sent_stats, hvm_sent_data = s_model.all_species_p_sentience_priors_based(s_model.ss_f, priors, "Martina's High-Value Proxies", data, hvm_proxies, SENT_SPECIES, NUM_SCENARIOS, sometimes_operates_scores, SCENARIO_RANGES, to_plot=False)
+hvm_sent_stats, hvm_sent_data = s_model.all_species_p_sentience_priors_based(s_model.ss_f, priors, "Martina's High-Value Proxies", data_sent, hvm_proxies, SENT_SPECIES, NUM_SCENARIOS, sometimes_operates_scores, SCENARIO_RANGES, to_plot=False)
 print("Martina's High-Value Proxies Model:")
 print(hvm_sent_stats)
 s_model.box_plot_adj_wr("Martina's High-Value Proxies", hvm_sent_data, species_caps)
 
 ## Anna's High-Value Proxies
-hva_sent_stats, hva_sent_data = s_model.all_species_p_sentience_priors_based(s_model.ss_f, priors, "Anna's High-Value Proxies", data, hva_proxies, SENT_SPECIES, NUM_SCENARIOS, sometimes_operates_scores, SCENARIO_RANGES, to_plot=False)
+hva_sent_stats, hva_sent_data = s_model.all_species_p_sentience_priors_based(s_model.ss_f, priors, "Anna's High-Value Proxies", data_sent, hva_proxies, SENT_SPECIES, NUM_SCENARIOS, sometimes_operates_scores, SCENARIO_RANGES, to_plot=False)
 print("Anna's High-Value Proxies Model:")
 print(hva_sent_stats)
 s_model.box_plot_adj_wr("Anna's High-Value Proxies", hva_sent_data, species_caps)
@@ -346,7 +305,7 @@ sim_utils.clear_make_dir('birch_estimates')
 
 birch_proxies = pd.read_csv(os.path.join('input_data', 'Birch Model Proxies.csv'))
 
-birch_overalls, birch_sent_data = s_model.all_species_birch_est(SENT_SPECIES,data,priors,birch_proxies,sometimes_operates_scores,NUM_SCENARIOS,SCENARIO_RANGES)
+birch_overalls, birch_sent_data = s_model.all_species_birch_est(SENT_SPECIES,data_sent,priors,birch_proxies,sometimes_operates_scores,NUM_SCENARIOS,SCENARIO_RANGES)
 print("Birch Model Sentience Estimates")
 print(birch_overalls)
 s_model.box_plot_adj_wr("Birch Model", birch_sent_data, species_caps)
@@ -527,28 +486,11 @@ SPECIES = ['pigs', 'chickens', 'carp', 'salmon', 'octopuses', 'shrimp', 'crabs',
 
 SCENARIO_RANGES = [1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99]
 
-params = pickle.load(open(os.path.join('input_data', "Welfare Range Parameters.p"), 'rb'))
-NUM_SCENARIOS = params['N_SCENARIOS']
-HC_WEIGHT = params['HC_WEIGHT']
-WEIGHT_NOS = params['WEIGHT_NOS']
+NUM_SCENARIOS = WR_PARAMS['N_SCENARIOS']
+HC_WEIGHT = WR_PARAMS['HC_WEIGHT']
+WEIGHT_NOS = WR_PARAMS['WEIGHT_NOS']
 
-sent_params = pickle.load(open(os.path.join('input_data', 'Sentience Parameters.p'), 'rb'))
-SENT_HC_WEIGHT = sent_params['HC_WEIGHT']
-
-# import simulated scores
-pig_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "wr_pigs")), 'rb'))
-chicken_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "wr_chickens")), 'rb'))
-carp_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "wr_carp")), 'rb'))
-salmon_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "wr_salmon")), 'rb'))
-octopus_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "wr_octopuses")), 'rb'))
-shrimp_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "wr_shrimp")), 'rb'))
-crab_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "wr_crabs")), 'rb'))
-crayfish_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "wr_crayfish")), 'rb'))
-bee_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "wr_bees")), 'rb'))
-bsf_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "wr_bsf")), 'rb'))
-silkworm_scores = pickle.load(open('{}_simulated_scores.p'.format(os.path.join('output_data', "wr_silkworms")), 'rb'))
-
-unknown_probabilities = pickle.load(open(os.path.join('input_data', "Welfare Range Unknown Probabilities.p"), 'rb'))
+SENT_HC_WEIGHT = S_PARAMS['HC_WEIGHT']
 
 overlap_csv = os.path.join('input_data', 'Proxy Overlap.csv')
 overlap_dict = {}
@@ -566,19 +508,7 @@ with open(overlap_csv) as f:
                     overlap_dict[corr_proxy] = []
                 overlap_dict[corr_proxy].append(sent_proxy)
 
-data = {'pigs': {'Scores': pig_scores, 'FFF': 75, 'Unknown Prob': unknown_probabilities['pigs']}, 
-        'chickens': {'Scores': chicken_scores, 'FFF': 50, 'Unknown Prob': unknown_probabilities['chickens']}, 
-        'carp': {'Scores': carp_scores, 'FFF': 72, 'Unknown Prob': unknown_probabilities['carp']}, 
-        'salmon': {'Scores': salmon_scores, 'FFF': 72, 'Unknown Prob': unknown_probabilities['salmon']},
-        'octopuses': {'Scores': octopus_scores, 'FFF': 45, 'Unknown Prob': unknown_probabilities['octopuses']}, 
-        'shrimp': {'Scores': shrimp_scores, 'FFF': 80, 'Unknown Prob': unknown_probabilities['shrimp']}, 
-        'crabs': {'Scores': crab_scores, 'FFF': 14, 'Unknown Prob': unknown_probabilities['crabs']}, 
-        'crayfish': {'Scores': crayfish_scores, 'FFF': 55, 'Unknown Prob': unknown_probabilities['crayfish']},
-        'bees': {'Scores': bee_scores, 'FFF': 110, 'Unknown Prob': unknown_probabilities['bees']}, 
-        'bsf': {'Scores': bsf_scores, 'FFF': None, 'Unknown Prob': unknown_probabilities['bsf']}, 
-        'silkworms': {'Scores': silkworm_scores, 'FFF': None, 'Unknown Prob': unknown_probabilities['silkworms']}}
-
-print(test_simulations.test_wr_scores(data, overlap_dict, HC_WEIGHT, SENT_HC_WEIGHT, SPECIES))
+print(test_simulations.test_wr_scores(data_wr, overlap_dict, HC_WEIGHT, SENT_HC_WEIGHT, SPECIES))
 
 sim_utils.clear_make_dir('welfare_range_estimates')
 
@@ -661,44 +591,44 @@ else:
 
 print("Proxies we're higly confident matter for welfare capacities are given", HC_WEIGHT, "x the weight of other proxies.")
 
-wr_model.unknown_probs_df(SPECIES,data)
+wr_model.unknown_probs_df(SPECIES,data_wr)
 
 ## Qualitative Model
 
-qual_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.qual_f, "Qualitative", data, qual_proxies, hc_proxies, SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
+qual_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.qual_f, "Qualitative", data_wr, qual_proxies, hc_proxies, SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
 
 ## High-Confidence (Simple Scoring)
 
 
-ss_hc_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.ss_hc_f, "High-Confidence (Simple Scoring)", data, hc_proxies, hc_proxies, SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
+ss_hc_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.ss_hc_f, "High-Confidence (Simple Scoring)", data_wr, hc_proxies, hc_proxies, SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
 
 ## Cubic Model
 
-cubic_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.cubic_f, "Cubic", data, cubic_proxies, hc_proxies, SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
+cubic_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.cubic_f, "Cubic", data_wr, cubic_proxies, hc_proxies, SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
 
 ## High-Confidence Proxies (Cubic Model)
 
-hc_cubic_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.cubic_hc_f, "High-Confidence (Cubic)", data, \
+hc_cubic_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.cubic_hc_f, "High-Confidence (Cubic)", data_wr, \
     hc_proxies, hc_proxies, SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
     
 ## Qualitative Minus Social Model
 
-qms_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.qms_f, "Qualitative Minus Social", data, \
+qms_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.qms_f, "Qualitative Minus Social", data_wr, \
     qms_proxies, hc_proxies, SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
     
 ## Pleasure-and-pain-centric Model
 
-ppc_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.ppc_f, "Pleasure-and-pain-centric", data, ppc_proxies, \
+ppc_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.ppc_f, "Pleasure-and-pain-centric", data_wr, ppc_proxies, \
     hc_proxies, SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
     
 ## Higher/Lower Pleasures Model
 
-hlp_wr_stats = wr_model.all_species_welfare_ranges_2(wr_model.hlp_f, "Higher-Lower Pleasures", data, hlp_cog_proxies, \
+hlp_wr_stats = wr_model.all_species_welfare_ranges_2(wr_model.hlp_f, "Higher-Lower Pleasures", data_wr, hlp_cog_proxies, \
     hlp_hed_proxies, hc_proxies, SPECIES, NUM_SCENARIOS, HC_WEIGHT, SCENARIO_RANGES, to_plot=False)
 
 ## Undiluted Experience Model
 
-ue_wr_stats = wr_model.all_species_welfare_ranges_2(wr_model.ue_f, "Undiluted Experience", data, ue_cog_proxies, \
+ue_wr_stats = wr_model.all_species_welfare_ranges_2(wr_model.ue_f, "Undiluted Experience", data_wr, ue_cog_proxies, \
     ue_hed_proxies, hc_proxies, SPECIES, NUM_SCENARIOS, HC_WEIGHT, SCENARIO_RANGES, to_plot=False)
 
 ## Mixture Model    
@@ -829,8 +759,8 @@ class TestSimpleFunctions(unittest.TestCase,):
         pass_test = True
         for model in simple_models:
             model_proxies = simple_models[model]["Proxies"]
-            for animal in data.keys():
-                animal_scores = data[animal]["Scores"]
+            for animal in data_wr.keys():
+                animal_scores = data_wr[animal]["Scores"]
                 if set(wr_model.filter_proxies(animal_scores, model_proxies).keys()) != model_proxies:
                     pass_test = False
         self.assertTrue(pass_test)    

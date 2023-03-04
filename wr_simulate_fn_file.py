@@ -15,9 +15,7 @@ def wr_simulate_fn(SPECIES,UNKNOWN_PROB,WEIGHT_NO,HC_WEIGHT,N_SCENARIOS,VERBOSE,
                 'plants', 'prokaryotes', 'protists', 'chickens', \
                 'cows', 'humans', 'sometimes_operates', 'bsf', \
                 'carp', 'salmon', 'silkworms', 'pigs']
-    
-    SCENARIO_RANGES = [1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99]  # Generate printed output for these percentiles
-    
+        
     judgements = pd.read_csv(os.path.join('input_data', 'WR Judgments.csv'))
     
     hc_csv = os.path.join('input_data', 'WR High-Confidence Proxies.csv')
@@ -146,4 +144,5 @@ def wr_simulate_fn(SPECIES,UNKNOWN_PROB,WEIGHT_NO,HC_WEIGHT,N_SCENARIOS,VERBOSE,
         print('... Saving 1/1')
         pickle.dump(simulated_scores, open('{}simulated_scores.p'.format(PATH), 'wb'))
 
+    return simulated_scores
     

@@ -9,22 +9,6 @@ from scipy import stats
 
 def sent_simulate_fn(SPECIES,UNKNOWN_PROB,WEIGHT_NO,HC_WEIGHT,N_SCENARIOS,VERBOSE,CSV,SAVE,PATH,update_every):
 
-    '''
-    parser = argparse.ArgumentParser(description='Generate probability of sentience ranges')
-    parser.add_argument('--species', type=str, help="What species do you want to simulate the probability of sentience of?")
-    parser.add_argument('--unknown_prob', type=float, help="What probability do you assign Unknown judgements for this species?", default=0)
-    parser.add_argument('--weight_no', type=str, help="Do you want to give non-zero probability to lean no and likely no?")
-    parser.add_argument('--hc_weight', type=float, help="What weight do high-confidence proxies get relative to other proxies?")
-    parser.add_argument('--scenarios', type=int, help='How many Monte Carlo simulations to run?', default=10000)
-    parser.add_argument('--csv', type=str, help='Define the relative path to the CSV with the species scores information')
-    parser.add_argument('--path', type=str, help='Define a custom path for the saved model outputs', default='')
-    parser.add_argument('--save', type=bool, help='Set to False to not save (overwrite) model outputs', default=True)
-    parser.add_argument('--update_every', type=int, help='How many steps to run before updating?', default=1000)
-    parser.add_argument('--verbose', type=bool, help='Set to True to get scenario-specific output', default=False)
-    args = parser.parse_args()
-    '''
-    SCENARIO_RANGES = [1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99]  # Generate printed output for these percentiles
-    
     judgments = pd.read_csv(os.path.join('input_data', 'Sentience Judgments.csv'))
     
     hc_csv = os.path.join('input_data', 'Sentience High-Confidence Proxies.csv')
@@ -105,3 +89,5 @@ def sent_simulate_fn(SPECIES,UNKNOWN_PROB,WEIGHT_NO,HC_WEIGHT,N_SCENARIOS,VERBOS
     if SAVE:
         print('... Saving 1/1')
         pickle.dump(simulated_scores, open('{}simulated_scores.p'.format(PATH), 'wb'))
+        
+    return simulated_scores
