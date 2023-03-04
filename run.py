@@ -7,7 +7,6 @@
 import os
 import csv
 import pandas as pd
-import warnings
 import pickle
 import copy
 from sent_simulate_fn_file import *
@@ -58,7 +57,7 @@ s_unknowns   = copy.deepcopy(sent_default_unknowns)
 s_weight_nos = "Yes"
 s_hc_weight  = 5
 
-S_PARAMS = {'N_SCENARIOS': 200, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": s_weight_nos, "HC_WEIGHT": s_hc_weight}
+S_PARAMS = {'N_SCENARIOS': 10000, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": s_weight_nos, "HC_WEIGHT": s_hc_weight}
 
 ## Welfare Ranges 
 print("For the WELFARE RANGES...")
@@ -66,7 +65,7 @@ wr_unknowns   = copy.deepcopy(wr_default_unknowns)
 wr_weight_nos = "Yes"
 wr_hc_weight  = 5
 
-WR_PARAMS = {'N_SCENARIOS': 200, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": wr_weight_nos, "HC_WEIGHT": wr_hc_weight}
+WR_PARAMS = {'N_SCENARIOS': 10000, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": wr_weight_nos, "HC_WEIGHT": wr_hc_weight}
 
 
 def simulate_scores(species, params, s_or_wr):
@@ -479,13 +478,6 @@ res2 = unittest.main(argv=[''], verbosity=3, exit=False)
 
 ################## Welfare Range Computation ################## 
 
-warnings.filterwarnings('ignore')
-plt.rcParams['figure.figsize'] = (18.5 * 0.65, 10.5 * 0.65)
-
-SPECIES = ['pigs', 'chickens', 'carp', 'salmon', 'octopuses', 'shrimp', 'crabs', 'crayfish', 'bees', 'bsf', 'silkworms']
-
-SCENARIO_RANGES = [1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99]
-
 NUM_SCENARIOS = WR_PARAMS['N_SCENARIOS']
 HC_WEIGHT = WR_PARAMS['HC_WEIGHT']
 WEIGHT_NOS = WR_PARAMS['WEIGHT_NOS']
@@ -508,7 +500,7 @@ with open(overlap_csv) as f:
                     overlap_dict[corr_proxy] = []
                 overlap_dict[corr_proxy].append(sent_proxy)
 
-print(test_simulations.test_wr_scores(data_wr, overlap_dict, HC_WEIGHT, SENT_HC_WEIGHT, SPECIES))
+print(test_simulations.test_wr_scores(data_wr, overlap_dict, HC_WEIGHT, SENT_HC_WEIGHT, WR_SPECIES))
 
 sim_utils.clear_make_dir('welfare_range_estimates')
 
@@ -591,45 +583,45 @@ else:
 
 print("Proxies we're higly confident matter for welfare capacities are given", HC_WEIGHT, "x the weight of other proxies.")
 
-wr_model.unknown_probs_df(SPECIES,data_wr)
+wr_model.unknown_probs_df(WR_SPECIES,data_wr)
 
 ## Qualitative Model
 
-qual_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.qual_f, "Qualitative", data_wr, qual_proxies, hc_proxies, SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
+qual_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.qual_f, "Qualitative", data_wr, qual_proxies, hc_proxies, WR_SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
 
 ## High-Confidence (Simple Scoring)
 
 
-ss_hc_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.ss_hc_f, "High-Confidence (Simple Scoring)", data_wr, hc_proxies, hc_proxies, SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
+ss_hc_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.ss_hc_f, "High-Confidence (Simple Scoring)", data_wr, hc_proxies, hc_proxies, WR_SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
 
 ## Cubic Model
 
-cubic_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.cubic_f, "Cubic", data_wr, cubic_proxies, hc_proxies, SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
+cubic_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.cubic_f, "Cubic", data_wr, cubic_proxies, hc_proxies, WR_SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
 
 ## High-Confidence Proxies (Cubic Model)
 
 hc_cubic_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.cubic_hc_f, "High-Confidence (Cubic)", data_wr, \
-    hc_proxies, hc_proxies, SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
+    hc_proxies, hc_proxies, WR_SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
     
 ## Qualitative Minus Social Model
 
 qms_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.qms_f, "Qualitative Minus Social", data_wr, \
-    qms_proxies, hc_proxies, SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
+    qms_proxies, hc_proxies, WR_SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
     
 ## Pleasure-and-pain-centric Model
 
 ppc_wr_stats = wr_model.all_species_welfare_ranges_simple_scoring(wr_model.ppc_f, "Pleasure-and-pain-centric", data_wr, ppc_proxies, \
-    hc_proxies, SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
+    hc_proxies, WR_SPECIES, SCENARIO_RANGES, HC_WEIGHT, NUM_SCENARIOS, to_plot=False)
     
 ## Higher/Lower Pleasures Model
 
 hlp_wr_stats = wr_model.all_species_welfare_ranges_2(wr_model.hlp_f, "Higher-Lower Pleasures", data_wr, hlp_cog_proxies, \
-    hlp_hed_proxies, hc_proxies, SPECIES, NUM_SCENARIOS, HC_WEIGHT, SCENARIO_RANGES, to_plot=False)
+    hlp_hed_proxies, hc_proxies, WR_SPECIES, NUM_SCENARIOS, HC_WEIGHT, SCENARIO_RANGES, to_plot=False)
 
 ## Undiluted Experience Model
 
 ue_wr_stats = wr_model.all_species_welfare_ranges_2(wr_model.ue_f, "Undiluted Experience", data_wr, ue_cog_proxies, \
-    ue_hed_proxies, hc_proxies, SPECIES, NUM_SCENARIOS, HC_WEIGHT, SCENARIO_RANGES, to_plot=False)
+    ue_hed_proxies, hc_proxies, WR_SPECIES, NUM_SCENARIOS, HC_WEIGHT, SCENARIO_RANGES, to_plot=False)
 
 ## Mixture Model    
     
@@ -638,7 +630,7 @@ model_results = {'Qualitative': qual_wr_stats, 'High-Confidence Simple Scoring':
     'Qualitative Minus Social': qms_wr_stats, 'Pleasure-and-pain-centric': ppc_wr_stats, \
     'Higher-Lower Pleasures': hlp_wr_stats, 'Undiluted Experience': ue_wr_stats}
     
-mixture = wr_model.all_species_mixture(model_results, [1/8]*8, SPECIES, NUM_SCENARIOS, SCENARIO_RANGES)
+mixture = wr_model.all_species_mixture(model_results, [1/8]*8, WR_SPECIES, NUM_SCENARIOS, SCENARIO_RANGES)
 
 ## Mixture with Neuron Count
 
@@ -649,7 +641,7 @@ neuron_counts = {'pigs': 0.005350, 'chickens': 0.002439,
                 'bees': 0.000013, 'bsf': 0.000004, 
                 'silkworms': 0.00001}
 
-_count = wr_model.all_species_mixture_with_neuron_counts(model_results, [1/9]*9, SPECIES, neuron_counts, NUM_SCENARIOS, SCENARIO_RANGES )
+_count = wr_model.all_species_mixture_with_neuron_counts(model_results, [1/9]*9, WR_SPECIES, neuron_counts, NUM_SCENARIOS, SCENARIO_RANGES )
 
 
 SPECIES2 = ['pigs', 'chickens', 'carp', 'octopuses', 'bees', 'salmon', 'crayfish', 'shrimp',  'crabs', 'bsf', 'silkworms']
