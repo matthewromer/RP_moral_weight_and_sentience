@@ -41,7 +41,7 @@ s_unknowns   = copy.deepcopy(sent_default_unknowns)
 s_weight_nos = "Yes"
 s_hc_weight  = 5
 
-S_PARAMS = {'N_SCENARIOS': 10000, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": s_weight_nos, "HC_WEIGHT": s_hc_weight}
+S_PARAMS = {'N_SCENARIOS': 100, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": s_weight_nos, "HC_WEIGHT": s_hc_weight}
 
 ## Welfare Ranges 
 print("For the WELFARE RANGES...")
@@ -61,8 +61,8 @@ for key, value in fff.items():
 neuron_counts_int =  dfData['NC']
 neuron_counts    = neuron_counts_int.to_dict()
 WR_SPECIES = list(dfData.index)
-WR_PARAMS = {'N_SCENARIOS': 10000, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": wr_weight_nos, "HC_WEIGHT": wr_hc_weight}
-
+WR_PARAMS = {'N_SCENARIOS': 100, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": wr_weight_nos, "HC_WEIGHT": wr_hc_weight}
+output_dir_adj = 'Sent_Adj_WR_Outputs'
 
 def simulate_scores(species, params, s_or_wr):
     print("### {} ###".format(s_or_wr.upper()))
@@ -643,89 +643,55 @@ models = ['Qualitative', 'High-Confidence (Simple Scoring)', \
     
 ### Qualitative
 model = "Qualitative"
-print(model)
-print("P(Sentience) Adjusted Welfare Range:")
-qual_df, qual_adj_wrs =  wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES)
-print(qual_df)
+qual_df, qual_adj_wrs =  wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES,output_dir_adj)
 wr_model.box_plot_adj_wr(model, qual_adj_wrs, SPECIES2)
 
 ### High-Confidence Simple Scoring
 model = "High-Confidence (Simple Scoring)"
-print(model)
-print("P(Sentience) Adjusted Welfare Range:")
-hc_ss_df, hc_ss_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES)
-print(hc_ss_df)
+hc_ss_df, hc_ss_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES,output_dir_adj)
 wr_model.box_plot_adj_wr(model, hc_ss_adj_wrs, SPECIES2)
 
 ### Cubic
 model = "Cubic"
-print(model)
-print("P(Sentience) Adjusted Welfare Range:")
-cubic_df, cubic_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES)
-print(cubic_df)
+cubic_df, cubic_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES,output_dir_adj)
 wr_model.box_plot_adj_wr(model, cubic_adj_wrs, SPECIES2)
 
 ### High-Confidence Cubic
 model = "High-Confidence (Cubic)"
-print(model)
-print("P(Sentience) Adjusted Welfare Range:")
-hc_cubic_df, hc_cubic_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES)
-print(hc_cubic_df)
+hc_cubic_df, hc_cubic_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES,output_dir_adj)
 wr_model.box_plot_adj_wr(model, hc_cubic_adj_wrs, SPECIES2)
 
 ### Qualitative Minus Social
 model = "Qualitative Minus Social"
-print(model)
-print("P(Sentience) Adjusted Welfare Range:")
-qms_df, qms_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES)
-print(qms_df)
+qms_df, qms_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES,output_dir_adj)
 wr_model.box_plot_adj_wr(model, qms_adj_wrs, SPECIES2)
 
 ### Pleasure-and-pain-centric
 model = "Pleasure-and-pain-centric"
-print(model)
-print("P(Sentience) Adjusted Welfare Range:")
-ppc_df, ppc_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES)
-print(ppc_df)
+ppc_df, ppc_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES,output_dir_adj)
 wr_model.box_plot_adj_wr(model, ppc_adj_wrs, SPECIES2)
 
 ### Higher-lower Pleasures
 model = "Higher-Lower Pleasures"
-print(model)
-print("P(Sentience) Adjusted Welfare Range:")
-hlp_df, hlp_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES)
-print(hlp_df)
+hlp_df, hlp_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES,output_dir_adj)
 wr_model.box_plot_adj_wr(model, hlp_adj_wrs, SPECIES2)
 
 ### Undiluted Experience
 model = "Undiluted Experience"
-print(model)
-print("P(Sentience) Adjusted Welfare Range:")
-ue_df, ue_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES)
-print(ue_df)
+ue_df, ue_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES,output_dir_adj)
 wr_model.box_plot_adj_wr(model, ue_adj_wrs, SPECIES2)
 
 ### Mixture
-model = "Mixture"
-print(model)
-print("P(Sentience) Adjusted Welfare Range:")
-mix_df, mix_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES)
-print(mix_df)
+mix_df, mix_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES,output_dir_adj)
 wr_model.box_plot_adj_wr(model, mix_adj_wrs, SPECIES2)
-
 wr_model.box_plot_adj_wr(model, mix_adj_wrs, SPECIES2, showfliers=False)
 
 ## Mixture With Neuron Count Model
 model = "Mixture Neuron Count"
-print(model)
-print("P(Sentience) Adjusted Welfare Range:")
-mix_df, mix_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES)
-for i in range(0,len(SPECIES2)):
-    pickle.dump(mix_adj_wrs[i], open(os.path.join('Sent_Adj_WR_Outputs', '{}_wr_Mixture Neuron Count_model.p'.format(SPECIES2[i])), 'wb'))
+mix_df, mix_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES,output_dir_adj)
 
-print(mix_df)
+
 wr_model.box_plot_adj_wr(model, mix_adj_wrs, SPECIES2)
-
 wr_model.box_plot_adj_wr(model, mix_adj_wrs, SPECIES2, showfliers=False)
 
 class TestSimpleFunctions(unittest.TestCase,):

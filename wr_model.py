@@ -402,7 +402,7 @@ def one_species_adj_wr(species, model_name, NUM_SCENARIOS):
 
 import seaborn as sns
 
-def all_species_adj_wr(model_name,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES):
+def all_species_adj_wr(model_name,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES,output_dir_adj):
     fifth_percentiles = []
     medians = []
     ninty_fifth_percentiles = []
@@ -422,7 +422,15 @@ def all_species_adj_wr(model_name,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES):
     adj_wr_df = adj_wr_df.sort_values("50th-pct", ascending=False)
     path = os.path.join('welfare_range_estimates', "Adjusted {} Welfare Ranges - Summary Statistics.csv".format(model_name))
     adj_wr_df.to_csv(path, index_label="Species")
+    
+    print(model_name)
+    print("P(Sentience) Adjusted Welfare Range:")
+    print(adj_wr_df)
+    
 
+    for i in range(0,len(SPECIES2)):
+        pickle.dump(species_adj_wrs[i], open(os.path.join(output_dir_adj,'{} {}.p'.format(SPECIES2[i], model_name)), 'wb'))    
+    
     return adj_wr_df, species_adj_wrs
 
 
