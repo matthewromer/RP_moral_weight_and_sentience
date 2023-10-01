@@ -22,17 +22,12 @@ import numpy as np
 
 ################## Simulations ##################
 
-WR_SPECIES = ['pigs', 'chickens', 'carp', 'salmon', 'octopuses', 'shrimp', 'crabs', 'crayfish', 'bees', 'bsf', 'silkworms']
-
 SENT_SPECIES = ['bees', 'cockroaches', 'fruit_flies', 'ants', \
             'c_elegans', 'crabs', 'crayfish', 'earthworms', \
             'sea_hares',  'spiders', 'octopuses', 'chickens', \
             'cows', 'sometimes_operates', 'bsf', \
             'carp', 'salmon', 'silkworms', 'pigs']
 
-wr_default_unknowns = {'pigs': 0, 'chickens': 0, 'carp': 0, 'salmon': 0, 
-                            'octopuses': 0, 'shrimp': 0, 'crabs': 0, 'crayfish': 0, 'bees': 0,
-                            'bsf': 0, 'silkworms': 0}
 
 sent_default_unknowns = {'bees': 0, 'cockroaches': 0, 'fruit_flies': 0, 'ants':0, \
             'c_elegans': 0, 'crabs': 0, 'crayfish': 0, 'earthworms': 0, \
@@ -40,18 +35,7 @@ sent_default_unknowns = {'bees': 0, 'cockroaches': 0, 'fruit_flies': 0, 'ants':0
             'cows': 0, 'sometimes_operates': 0, 'bsf': 0, \
             'carp': 0, 'salmon': 0, 'silkworms': 0, 'pigs': 0}
 
-fff =   {'pigs': 75, 
-            'chickens':50,
-            'carp': 72,
-            'salmon': 72,
-            'octopuses': 45,
-            'shrimp':  80, 
-            'crabs': 14, 
-            'crayfish':  55,
-            'bees': 110, 
-            'bsf':  None, 
-            'silkworms': None}
-## Sentience 
+
 print("For the PROBABILITY OF SENTIENCE...")
 s_unknowns   = copy.deepcopy(sent_default_unknowns)
 s_weight_nos = "Yes"
@@ -61,10 +45,22 @@ S_PARAMS = {'N_SCENARIOS': 10000, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": s_weight_n
 
 ## Welfare Ranges 
 print("For the WELFARE RANGES...")
-wr_unknowns   = copy.deepcopy(wr_default_unknowns)
 wr_weight_nos = "Yes"
 wr_hc_weight  = 5
-
+# Parse welfare range input data 
+dfData = pd.read_csv(os.path.join('input_data', 'WR_Inputs_2.csv'), index_col=0,header=5)
+wr_unknown_weight_int =  dfData['Unknown Weight']
+wr_unknowns    = wr_unknown_weight_int.to_dict()
+fff_int =  dfData['FFF']
+fff  = fff_int.to_dict()
+for key, value in fff.items():
+    if value == 'None':
+        fff[key] = None
+    else: 
+        fff[key] = float(value)
+neuron_counts_int =  dfData['NC']
+neuron_counts    = neuron_counts_int.to_dict()
+WR_SPECIES = list(dfData.index)
 WR_PARAMS = {'N_SCENARIOS': 10000, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": wr_weight_nos, "HC_WEIGHT": wr_hc_weight}
 
 
@@ -167,9 +163,7 @@ unknowns_df = s_model.unknown_probs_df(SPECIES,data_sent)
 
 # Priors-Based Scoring
 
-SENT_SPECIES = ['bees', 'cockroaches', 'fruit_flies', 'ants', 'c_elegans', 'crabs', 'crayfish', \
-        'earthworms', 'sea_hares', 'spiders', 'octopuses', 'chickens', 'cows', 'bsf', \
-        'carp', 'salmon', 'silkworms', 'pigs']
+SENT_SPECIES.remove('sometimes_operates')
 
 species_caps = ["Bees", "Cockroaches", "Fruit Flies", "Ants", \
                 "C. elegans", "Crabs", "Crayfish", "Earthworms", \
@@ -634,13 +628,6 @@ mixture = wr_model.all_species_mixture(model_results, [1/8]*8, WR_SPECIES, NUM_S
 
 ## Mixture with Neuron Count
 
-neuron_counts = {'pigs': 0.005350, 'chickens': 0.002439, 
-                'carp': 0.000160, 'salmon': 0.001163, 
-                'octopuses': 0.005407, 'shrimp': 0.000001, 
-                'crabs': 0.000001, 'crayfish': 0.000001, 
-                'bees': 0.000013, 'bsf': 0.000004, 
-                'silkworms': 0.00001}
-
 _count = wr_model.all_species_mixture_with_neuron_counts(model_results, [1/9]*9, WR_SPECIES, neuron_counts, NUM_SCENARIOS, SCENARIO_RANGES )
 
 
@@ -733,6 +720,9 @@ model = "Mixture Neuron Count"
 print(model)
 print("P(Sentience) Adjusted Welfare Range:")
 mix_df, mix_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES)
+for i in range(0,len(SPECIES2)):
+    pickle.dump(mix_adj_wrs[i], open(os.path.join('Sent_Adj_WR_Outputs', '{}_wr_Mixture Neuron Count_model.p'.format(SPECIES2[i])), 'wb'))
+
 print(mix_df)
 wr_model.box_plot_adj_wr(model, mix_adj_wrs, SPECIES2)
 
