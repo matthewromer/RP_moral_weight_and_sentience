@@ -9,13 +9,13 @@ for the RP moral weights
 import os
 import pickle
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-import squigglepy as sq
 import random
 import matplotlib as mpl
 from heatmap_wr_ranges import heatmap_wr_ranges
 from scatter_wr_ranges import scatter_wr_ranges
+from compute_y import compute_y
+import seaborn as sns
 
 #Inputs
 output_dir_adj = 'Sent_Adj_WR_Outputs'
@@ -41,6 +41,7 @@ numBins = 20
 xlims = [0,2]
 ylims = [0,2]
 textLoc = [1.05,1.8]
+my_pal = {"lightsteelblue","lightcoral","palegreen","mediumpurple"}
 
 # For each species, load the p(sentience)-adjusted welfare range simulation 
 # data for each welfare model
@@ -65,7 +66,24 @@ heatmap_wr_ranges(data['pigs','Mixture Neuron Count'], \
                   'Pigs','Chickens',xlims,ylims,pig_mean,chicken_mean,\
                   correlation_coeff,'Independent Sampling from Mixture Model',\
                   textLoc,numBins=numBins,printEn=True)
-        
+    
+y1Raw, y2Raw = compute_y(np.array(data['pigs','Mixture Neuron Count']),\
+                                 np.array(data['chickens','Mixture Neuron Count']))
+    
+
+pigsMixtureNeuronArr = np.array(data['pigs','Mixture Neuron Count'])
+pigs025 = np.percentile(pigsMixtureNeuronArr,2.5)
+pigs975 = np.percentile(pigsMixtureNeuronArr,97.5) 
+pigsMixtureNeuronTrimmed = pigsMixtureNeuronArr[pigsMixtureNeuronArr > pigs025]
+pigsMixtureNeuronTrimmed = pigsMixtureNeuronTrimmed[pigsMixtureNeuronTrimmed < pigs975]
+chickensMixtureNeuronArr = np.array(data['chickens','Mixture Neuron Count'])
+chickens025 = np.percentile(chickensMixtureNeuronArr,2.5)
+chickens975 = np.percentile(chickensMixtureNeuronArr,97.5) 
+chickensMixtureNeuronTrimmed = chickensMixtureNeuronArr[chickensMixtureNeuronArr > chickens025]
+chickensMixtureNeuronTrimmed = chickensMixtureNeuronTrimmed[chickensMixtureNeuronTrimmed < chickens975]
+
+y1Trimmed, y2Trimmed = compute_y(pigsMixtureNeuronTrimmed,chickensMixtureNeuronTrimmed)
+
 
 # Order results and plot paired results 
 dataSort = data
@@ -90,7 +108,9 @@ heatmap_wr_ranges(dataSort['pigs','Mixture Neuron Count'], \
                   correlation_coeff,'Sampling from Ordered Data',\
                   textLoc,numBins=numBins,printEn=True)
     
-   
+y1Ordered, y2Ordered = compute_y(np.array(dataSort['pigs','Mixture Neuron Count']),\
+                                 np.array(dataSort['chickens','Mixture Neuron Count']))
+
 
 # Sample from distribution for each welfare model and plot paired results 
 samples_per_model = int(num_samples/num_models)
@@ -114,3 +134,36 @@ heatmap_wr_ranges(data_per_model['pigs'],data_per_model['chickens'],\
                   'Pigs','Chickens',xlims,ylims,pig_mean,chicken_mean,\
                   correlation_coeff,'Paired Sampling from Constituent Models',\
                   textLoc,numBins=numBins,printEn=True)
+    
+
+chicken_wr = np.array(data_per_model['chickens'])
+pig_wr = np.array(data_per_model['pigs'])
+
+y1Paired, y2Paired = compute_y(np.array(data_per_model['pigs']),np.array(data_per_model['chickens']))
+
+plt.hist(y1Paired,bins=30)
+plt.show()
+
+plt.hist(y2Paired,bins=30)
+plt.show()
+
+#Results for shifting from chicken to pork (Box Plot)
+boxData = [y1Raw, y1Trimmed, y1Ordered, y1Paired]
+fig, ax = plt.subplots(figsize = (7,4),dpi=300)
+ax.set_xscale("log")
+sns.boxplot(data=boxData, orient='h', ax=ax, showfliers=False, palette=my_pal)
+ax.set_yticks([0, 1, 2, 3])
+ax.set_yticklabels(["Uncorrelated","Trimming Top/Bottom 2.5%","Ordering","Generating Samples Pair-Wise\nfrom Constituent Models"])        
+ax.set_xlabel("Weighted Days of Suffering Averted")
+ax.set_title("Suffering Averted by Switching from Chicken to Pork")        
+
+#Results for shifting from chicken to pork (Box Plot)
+boxData = [y2Raw, y2Trimmed, y2Ordered, y2Paired]
+fig, ax = plt.subplots(figsize = (7,4),dpi=300)
+ax.set_xscale("log")
+sns.boxplot(data=boxData, orient='h', ax=ax, showfliers=False, palette=my_pal)
+ax.set_yticks([0, 1, 2, 3])
+ax.set_yticklabels(["Uncorrelated","Trimming Top/Bottom 2.5%","Ordering","Generating Samples Pair-Wise\nfrom Constituent Models"])               
+ax.set_xlabel("Weighted Days of Suffering Caused")
+ax.set_title("Suffering Caused by Eating Chicken and Pork")        
+
