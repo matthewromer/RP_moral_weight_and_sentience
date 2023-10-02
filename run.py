@@ -18,6 +18,7 @@ import sim_utils
 import wr_model
 import unittest
 import numpy as np
+import squigglepy as sq
 
 
 ################## Simulations ##################
@@ -41,7 +42,7 @@ s_unknowns   = copy.deepcopy(sent_default_unknowns)
 s_weight_nos = "Yes"
 s_hc_weight  = 5
 
-S_PARAMS = {'N_SCENARIOS': 100, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": s_weight_nos, "HC_WEIGHT": s_hc_weight}
+S_PARAMS = {'N_SCENARIOS': 10000, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": s_weight_nos, "HC_WEIGHT": s_hc_weight}
 
 ## Welfare Ranges 
 print("For the WELFARE RANGES...")
@@ -61,7 +62,7 @@ for key, value in fff.items():
 neuron_counts_int =  dfData['NC']
 neuron_counts    = neuron_counts_int.to_dict()
 WR_SPECIES = list(dfData.index)
-WR_PARAMS = {'N_SCENARIOS': 100, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": wr_weight_nos, "HC_WEIGHT": wr_hc_weight}
+WR_PARAMS = {'N_SCENARIOS': 10000, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": wr_weight_nos, "HC_WEIGHT": wr_hc_weight}
 output_dir_adj = 'Sent_Adj_WR_Outputs'
 
 def simulate_scores(species, params, s_or_wr):
@@ -638,9 +639,20 @@ SPECIES_CAPS = ['Pigs', 'Chickens', 'Carp', 'Octopuses', 'Bees', 'Salmon', 'Cray
 models = ['Qualitative', 'High-Confidence (Simple Scoring)', \
     'Cubic', 'High-Confidence (Cubic)', \
     'Qualitative Minus Social', 'Pleasure-and-pain-centric', \
-    'Higher-Lower Pleasures', 'Undiluted Experience', "Mixture", "Mixture Neuron Count"]
+    'Higher-Lower Pleasures', 'Undiluted Experience', 'Mixture', \
+    'Mixture Neuron Count']
 
-    
+
+### Neuron Count
+# Note: neuron count model is a little different from the others and doesn't 
+# get adjusted for p(sentience). I've added this here to enable loading the 
+# neuron count results similarly to the other models 
+model_name = 'Neuron Count'
+for i in range(0,len(SPECIES2)):
+    NC_dist = sq.uniform(neuron_counts[SPECIES2[i]], neuron_counts[SPECIES2[i]])
+    species_adj_wrs_nc = sq.sample(NC_dist, n=NUM_SCENARIOS)
+    pickle.dump(species_adj_wrs_nc.tolist(), open(os.path.join(output_dir_adj,'{} {}.p'.format(SPECIES2[i], model_name)), 'wb'))    
+
 ### Qualitative
 model = "Qualitative"
 qual_df, qual_adj_wrs =  wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES,output_dir_adj)
@@ -682,6 +694,7 @@ ue_df, ue_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCE
 wr_model.box_plot_adj_wr(model, ue_adj_wrs, SPECIES2)
 
 ### Mixture
+model = "Mixture"
 mix_df, mix_adj_wrs = wr_model.all_species_adj_wr(model,NUM_SCENARIOS,SPECIES2,SCENARIO_RANGES,output_dir_adj)
 wr_model.box_plot_adj_wr(model, mix_adj_wrs, SPECIES2)
 wr_model.box_plot_adj_wr(model, mix_adj_wrs, SPECIES2, showfliers=False)
