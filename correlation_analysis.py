@@ -74,19 +74,15 @@ y1Raw, y2Raw = compute_y(np.array(data['pigs','Mixture Neuron Count']),\
 n = int(num_samples*0.025)
 m = int(num_samples*0.975)-n
 
-pigsMixtureNeuronArr = np.array(data['pigs','Mixture Neuron Count'])
-indx = sorted(np.argsort(pigsMixtureNeuronArr)[n:])
-pigsMixtureNeuronTrimmed = pigsMixtureNeuronArr[indx]
-indx2 = sorted(np.argsort(pigsMixtureNeuronTrimmed)[:m])
-pigsMixtureNeuronTrimmed = pigsMixtureNeuronTrimmed[indx2]
+indx = sorted(np.argsort(y1Raw)[n:])
+y1Trimmed = y1Raw[indx]
+indx2 = sorted(np.argsort(y1Trimmed)[:m])
+y1Trimmed = y1Trimmed[indx2]
 
-chickensMixtureNeuronArr = np.array(data['chickens','Mixture Neuron Count'])
-indx = sorted(np.argsort(chickensMixtureNeuronArr)[n:])
-chickensMixtureNeuronTrimmed = chickensMixtureNeuronArr[indx]
-indx2 = sorted(np.argsort(chickensMixtureNeuronTrimmed)[:m])
-chickensMixtureNeuronTrimmed = chickensMixtureNeuronTrimmed[indx2]
-
-y1Trimmed, y2Trimmed = compute_y(pigsMixtureNeuronTrimmed,chickensMixtureNeuronTrimmed)
+indx = sorted(np.argsort(y2Raw)[n:])
+y2Trimmed = y2Raw[indx]
+indx2 = sorted(np.argsort(y1Trimmed)[:m])
+y2Trimmed = y2Trimmed[indx2]
 
 
 # Order results and plot paired results 
