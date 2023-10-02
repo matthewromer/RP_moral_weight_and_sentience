@@ -14,6 +14,7 @@ sentience_estimates/
 welfare_range_estimates/
 birch_estimates/
 Sent_Adj_WR_Outputs/
+Plots/
 
 #System files
 .DS_Store

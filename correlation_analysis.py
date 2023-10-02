@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 import squigglepy as sq
 import random
 import matplotlib as mpl
+from heatmap_wr_ranges import heatmap_wr_ranges
+from scatter_wr_ranges import scatter_wr_ranges
 
 #Inputs
 output_dir_adj = 'Sent_Adj_WR_Outputs'
@@ -36,6 +38,9 @@ plt.rc('ytick', labelsize='x-small')
 mpl.rcParams['figure.dpi'] = 300
 area = 2
 numBins = 20
+xlims = [0,2]
+ylims = [0,2]
+textLoc = [1.05,1.8]
 
 # For each species, load the p(sentience)-adjusted welfare range simulation 
 # data for each welfare model
@@ -49,30 +54,17 @@ chicken_mean = round(np.mean(data['chickens','Mixture Neuron Count']),4)
 correlation_coeff = round(r[0,1],4)
 
 # Plot uncorrelated reults for pigs vs. chickens 
-fig = plt.figure(figsize=(8, 8))
-ax = fig.add_subplot(1, 1, 1)
-ax.set_xlabel('P(sentience)-Adjusted Welfare Range of Pigs')
-ax.set_ylabel('P(sentience)-Adjusted Welfare Range of Chickens')
-plt.text(1.2,1.8, 'Mean (Pigs) = {} \nMean (Chickens) = {} \nCorrelation = {}'.format(pig_mean,chicken_mean,correlation_coeff))
-plt.scatter(data['pigs','Mixture Neuron Count'], data['chickens','Mixture Neuron Count'], s=area)
-ax.set_xlim([0, 2])
-ax.set_ylim([0, 2])
-plt.title('Welfare Ranges (Independent Sampling from Mixture Model)')
-plt.grid()
-plt.show()        
+scatter_wr_ranges(data['pigs','Mixture Neuron Count'], \
+                  data['chickens','Mixture Neuron Count'],\
+                  'Pigs','Chickens',xlims,ylims,pig_mean,chicken_mean,\
+                  correlation_coeff,'Independent Sampling from Mixture Model',\
+                  textLoc,area=area) 
 
-fig = plt.figure(figsize=(8, 8))
-ax = fig.add_subplot(1, 1, 1)
-ax.set_facecolor('gray')
-plt.hist2d(data['pigs','Mixture Neuron Count'], data['chickens','Mixture Neuron Count'], bins=numBins,norm=mpl.colors.LogNorm())
-ax.set_xlabel('P(sentience)-Adjusted Welfare Range of Pigs')
-ax.set_ylabel('P(sentience)-Adjusted Welfare Range of Chickens')
-plt.text(1.3,1.8, 'Mean (Pigs) = {} \nMean (Chickens) = {} \nCorrelation = {}'.format(pig_mean,chicken_mean,correlation_coeff))
-ax.set_xlim([0, 2])
-ax.set_ylim([0, 2])
-plt.title('Welfare Ranges (Independent Sampling from Mixture Model)')
-plt.grid()
-plt.show()
+heatmap_wr_ranges(data['pigs','Mixture Neuron Count'], \
+                  data['chickens','Mixture Neuron Count'],\
+                  'Pigs','Chickens',xlims,ylims,pig_mean,chicken_mean,\
+                  correlation_coeff,'Independent Sampling from Mixture Model',\
+                  textLoc,numBins=numBins,printEn=True)
         
 
 # Order results and plot paired results 
@@ -86,31 +78,19 @@ pig_mean = round(np.mean(dataSort['pigs','Mixture Neuron Count']),4)
 chicken_mean = round(np.mean(dataSort['chickens','Mixture Neuron Count']),4)
 correlation_coeff = round(r[0,1],4)
 
-        
-fig = plt.figure(figsize=(8, 8))
-ax = fig.add_subplot(1, 1, 1)
-ax.set_xlabel('P(sentience)-Adjusted Welfare Range of Pigs')
-ax.set_ylabel('P(sentience)-Adjusted Welfare Range of Chickens')
-plt.text(1.2,1.8, 'Mean (Pigs) = {} \nMean (Chickens) = {} \nCorrelation = {}'.format(pig_mean,chicken_mean,correlation_coeff))
-plt.scatter(dataSort['pigs','Mixture Neuron Count'], dataSort['chickens','Mixture Neuron Count'], s=area)
-plt.title('Welfare Ranges (Sampling from Ordered Data)')
-ax.set_xlim([0, 2])
-ax.set_ylim([0, 2])
-plt.grid()
-plt.show()        
+scatter_wr_ranges(dataSort['pigs','Mixture Neuron Count'], \
+                  dataSort['chickens','Mixture Neuron Count'],\
+                  'Pigs','Chickens',xlims,ylims,pig_mean,chicken_mean,\
+                  correlation_coeff,'Sampling from Ordered Data',\
+                  textLoc,area=area) 
 
-fig = plt.figure(figsize=(8, 8))
-ax = fig.add_subplot(1, 1, 1)
-ax.set_facecolor('gray')
-plt.hist2d(dataSort['pigs','Mixture Neuron Count'], dataSort['chickens','Mixture Neuron Count'], bins=numBins,norm=mpl.colors.LogNorm())
-ax.set_xlabel('P(sentience)-Adjusted Welfare Range of Pigs')
-ax.set_ylabel('P(sentience)-Adjusted Welfare Range of Chickens')
-plt.text(1.3,1.8, 'Mean (Pigs) = {} \nMean (Chickens) = {} \nCorrelation = {}'.format(pig_mean,chicken_mean,correlation_coeff))
-ax.set_xlim([0, 2])
-ax.set_ylim([0, 2])
-plt.title('Welfare Ranges (Sampling from Ordered Data)')
-plt.grid()
-plt.show()
+heatmap_wr_ranges(dataSort['pigs','Mixture Neuron Count'], \
+                  dataSort['chickens','Mixture Neuron Count'],\
+                  'Pigs','Chickens',xlims,ylims,pig_mean,chicken_mean,\
+                  correlation_coeff,'Sampling from Ordered Data',\
+                  textLoc,numBins=numBins,printEn=True)
+    
+   
 
 # Sample from distribution for each welfare model and plot paired results 
 samples_per_model = int(num_samples/num_models)
@@ -125,30 +105,12 @@ pig_mean = round(np.mean(data_per_model['pigs']),4)
 chicken_mean = round(np.mean(data_per_model['chickens']),4)
 correlation_coeff = round(r[0,1],4)
 
-        
-fig = plt.figure(figsize=(8, 8))
-ax = fig.add_subplot(1, 1, 1)
-ax.set_xlabel('P(sentience)-Adjusted Welfare Range of Pigs')
-ax.set_ylabel('P(sentience)-Adjusted Welfare Range of Chickens')
-plt.text(1.2,1.8, 'Mean (Pigs) = {} \nMean (Chickens) = {} \nCorrelation = {}'.format(pig_mean,chicken_mean,correlation_coeff))
-plt.scatter(data_per_model['pigs'], data_per_model['chickens'], s=area)
-ax.set_xlim([0, 2])
-ax.set_ylim([0, 2])
-plt.title('Welfare Ranges (Paired Sampling from Constituent Models)')
-plt.grid()
-plt.show()
+scatter_wr_ranges(data_per_model['pigs'],data_per_model['chickens'],\
+                  'Pigs','Chickens',xlims,ylims,pig_mean,chicken_mean,\
+                  correlation_coeff,'Paired Sampling from Constituent Models',\
+                  textLoc,area=area)
 
-fig = plt.figure(figsize=(10, 8))
-ax = fig.add_subplot(1, 1, 1)
-ax.set_facecolor('gray')
-h = plt.hist2d(data_per_model['pigs'], data_per_model['chickens'], density=True,bins=numBins,norm=mpl.colors.LogNorm())
-ax.set_xlabel('P(sentience)-Adjusted Welfare Range of Pigs')
-ax.set_ylabel('P(sentience)-Adjusted Welfare Range of Chickens')
-plt.text(1.3,1.8, 'Mean (Pigs) = {} \nMean (Chickens) = {} \nCorrelation = {}'.format(pig_mean,chicken_mean,correlation_coeff))
-cbar = fig.colorbar(h[3], ax=ax)
-cbar.set_label('Density', rotation=270)
-ax.set_xlim([0, 2])
-ax.set_ylim([0, 2])
-plt.title('Welfare Ranges (Paired Sampling from Constituent Models)')
-plt.grid()
-plt.show()
+heatmap_wr_ranges(data_per_model['pigs'],data_per_model['chickens'],\
+                  'Pigs','Chickens',xlims,ylims,pig_mean,chicken_mean,\
+                  correlation_coeff,'Paired Sampling from Constituent Models',\
+                  textLoc,numBins=numBins,printEn=True)
