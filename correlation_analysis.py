@@ -18,12 +18,12 @@ from compute_y import compute_y
 import seaborn as sns
 
 #Inputs
-output_dir_adj = 'Sent_Adj_WR_Outputs'
+output_dir_adj = 'Sent_Adj_WR_Outputs2'
 models = ['Qualitative', 'High-Confidence (Simple Scoring)', \
     'Cubic', 'High-Confidence (Cubic)', \
     'Qualitative Minus Social', 'Pleasure-and-pain-centric', \
     'Higher-Lower Pleasures', 'Undiluted Experience', 'Neuron Count', \
-    'Mixture', 'Mixture Neuron Count']
+    'Mixture Neuron Count']
     
 species_list = ['pigs','chickens']
 
@@ -71,16 +71,20 @@ y1Raw, y2Raw = compute_y(np.array(data['pigs','Mixture Neuron Count']),\
                                  np.array(data['chickens','Mixture Neuron Count']))
     
 
+n = int(num_samples*0.025)
+m = int(num_samples*0.975)-n
+
 pigsMixtureNeuronArr = np.array(data['pigs','Mixture Neuron Count'])
-pigs025 = np.percentile(pigsMixtureNeuronArr,2.5)
-pigs975 = np.percentile(pigsMixtureNeuronArr,97.5) 
-pigsMixtureNeuronTrimmed = pigsMixtureNeuronArr[pigsMixtureNeuronArr > pigs025]
-pigsMixtureNeuronTrimmed = pigsMixtureNeuronTrimmed[pigsMixtureNeuronTrimmed < pigs975]
+indx = sorted(np.argsort(pigsMixtureNeuronArr)[n:])
+pigsMixtureNeuronTrimmed = pigsMixtureNeuronArr[indx]
+indx2 = sorted(np.argsort(pigsMixtureNeuronTrimmed)[:m])
+pigsMixtureNeuronTrimmed = pigsMixtureNeuronTrimmed[indx2]
+
 chickensMixtureNeuronArr = np.array(data['chickens','Mixture Neuron Count'])
-chickens025 = np.percentile(chickensMixtureNeuronArr,2.5)
-chickens975 = np.percentile(chickensMixtureNeuronArr,97.5) 
-chickensMixtureNeuronTrimmed = chickensMixtureNeuronArr[chickensMixtureNeuronArr > chickens025]
-chickensMixtureNeuronTrimmed = chickensMixtureNeuronTrimmed[chickensMixtureNeuronTrimmed < chickens975]
+indx = sorted(np.argsort(chickensMixtureNeuronArr)[n:])
+chickensMixtureNeuronTrimmed = chickensMixtureNeuronArr[indx]
+indx2 = sorted(np.argsort(chickensMixtureNeuronTrimmed)[:m])
+chickensMixtureNeuronTrimmed = chickensMixtureNeuronTrimmed[indx2]
 
 y1Trimmed, y2Trimmed = compute_y(pigsMixtureNeuronTrimmed,chickensMixtureNeuronTrimmed)
 
@@ -118,7 +122,7 @@ data_per_model = {}
 for species in species_list:
     data_per_model[species] = []
     for model in models:
-        data_per_model[species].extend(random.sample(data[species,model],samples_per_model))
+        data_per_model[species].extend(np.random.choice(data[species,model],samples_per_model))
 
 r = np.corrcoef(data_per_model['pigs'], data_per_model['chickens'])
 pig_mean = round(np.mean(data_per_model['pigs']),4)
@@ -150,7 +154,6 @@ plt.show()
 #Results for shifting from chicken to pork (Box Plot)
 boxData = [y1Raw, y1Trimmed, y1Ordered, y1Paired]
 fig, ax = plt.subplots(figsize = (7,4),dpi=300)
-ax.set_xscale("log")
 sns.boxplot(data=boxData, orient='h', ax=ax, showfliers=False, palette=my_pal)
 ax.set_yticks([0, 1, 2, 3])
 ax.set_yticklabels(["Uncorrelated","Trimming Top/Bottom 2.5%","Ordering","Generating Samples Pair-Wise\nfrom Constituent Models"])        
@@ -160,7 +163,6 @@ ax.set_title("Suffering Averted by Switching from Chicken to Pork")
 #Results for shifting from chicken to pork (Box Plot)
 boxData = [y2Raw, y2Trimmed, y2Ordered, y2Paired]
 fig, ax = plt.subplots(figsize = (7,4),dpi=300)
-ax.set_xscale("log")
 sns.boxplot(data=boxData, orient='h', ax=ax, showfliers=False, palette=my_pal)
 ax.set_yticks([0, 1, 2, 3])
 ax.set_yticklabels(["Uncorrelated","Trimming Top/Bottom 2.5%","Ordering","Generating Samples Pair-Wise\nfrom Constituent Models"])               

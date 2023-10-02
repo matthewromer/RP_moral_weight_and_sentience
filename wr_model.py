@@ -307,40 +307,68 @@ def all_species_mixture(model_results, weights, SPECIES, NUM_SCENARIOS, SCENARIO
     print(mixture_df)
     return mixture_df
 
-def mixture_one_species_with_neuron_count(model_results, species, wts, neuron_counts, NUM_SCENARIOS):
+def mixture_one_species_with_neuron_count(model_results, species, wts, neuron_counts, NUM_SCENARIOS,output_dir_adj2):
     # Neuron Count
     neuron_count = neuron_counts[species]
+    nc_dist = sq.uniform(neuron_count, neuron_count)
+    nc_smples = sq.sample(nc_dist, n=NUM_SCENARIOS)
+    pickle.dump(nc_smples, open(os.path.join(output_dir_adj2,'{} {}.p'.format(species, 'Neuron Count')), 'wb'))   
+    
     # Qualitative
     qual_lower = model_results['Qualitative'].loc[species]['5th-pct']
     qual_upper = model_results['Qualitative'].loc[species]['95th-pct']
+    qual_dist = sq.norm(qual_lower, qual_upper, lclip=0)
+    qual_smples = sq.sample(qual_dist, n=NUM_SCENARIOS)
+    pickle.dump(qual_smples, open(os.path.join(output_dir_adj2,'{} {}.p'.format(species, 'Qualitative')), 'wb'))      
 
     # High-Confidence (simple scoring)
     ss_hc_lower = model_results['High-Confidence Simple Scoring'].loc[species]['5th-pct']
     ss_hc_upper = model_results['High-Confidence Simple Scoring'].loc[species]['95th-pct']
+    ss_hc_dist = sq.norm(ss_hc_lower, ss_hc_upper, lclip=0)
+    ss_hc_smples = sq.sample(ss_hc_dist, n=NUM_SCENARIOS)
+    pickle.dump(ss_hc_smples, open(os.path.join(output_dir_adj2,'{} {}.p'.format(species, 'High-Confidence (Simple Scoring)')), 'wb'))        
     
     # Cubic
     cubic_lower = model_results['Cubic'].loc[species]['5th-pct']
     cubic_upper = model_results['Cubic'].loc[species]['95th-pct']
+    cubic_dist = sq.norm(cubic_lower, cubic_upper, lclip=0)
+    cubic_smples = sq.sample(cubic_dist, n=NUM_SCENARIOS)
+    pickle.dump(cubic_smples, open(os.path.join(output_dir_adj2,'{} {}.p'.format(species, 'Cubic')), 'wb'))         
     
     # High-confidence (Cubic)
     hc_cubic_lower = model_results['High-Confidence Cubic'].loc[species]['5th-pct']
     hc_cubic_upper = model_results['High-Confidence Cubic'].loc[species]['95th-pct']
+    hc_cubic_dist = sq.norm(hc_cubic_lower, hc_cubic_upper, lclip=0)
+    hc_cubic_smples = sq.sample(hc_cubic_dist, n=NUM_SCENARIOS)
+    pickle.dump(hc_cubic_smples, open(os.path.join(output_dir_adj2,'{} {}.p'.format(species, 'High-Confidence (Cubic)')), 'wb'))     
     
     # Qualitative Minus Social
     qms_lower = model_results['Qualitative Minus Social'].loc[species]['5th-pct']
     qms_upper = model_results['Qualitative Minus Social'].loc[species]['95th-pct']
+    qms_dist = sq.norm(qms_lower, qms_upper, lclip=0)
+    qms_smples = sq.sample(qms_dist, n=NUM_SCENARIOS)
+    pickle.dump(qms_smples, open(os.path.join(output_dir_adj2,'{} {}.p'.format(species, 'Qualitative Minus Social')), 'wb'))      
     
     # Pleasure-and-pain-centric
     ppc_lower = model_results['Pleasure-and-pain-centric'].loc[species]['5th-pct']
     ppc_upper = model_results['Pleasure-and-pain-centric'].loc[species]['95th-pct']
+    ppc_dist = sq.norm(ppc_lower, ppc_upper, lclip=0)
+    ppc_smples = sq.sample(ppc_dist, n=NUM_SCENARIOS)
+    pickle.dump(ppc_smples, open(os.path.join(output_dir_adj2,'{} {}.p'.format(species, 'Pleasure-and-pain-centric')), 'wb'))     
     
     # Higher-Lower Pleasures
     hlp_lower = model_results['Higher-Lower Pleasures'].loc[species]['5th-pct']
     hlp_upper = model_results['Higher-Lower Pleasures'].loc[species]['95th-pct']
+    hlp_dist = sq.norm(hlp_lower, hlp_upper, lclip=0)
+    hlp_smples = sq.sample(hlp_dist, n=NUM_SCENARIOS)
+    pickle.dump(hlp_smples, open(os.path.join(output_dir_adj2,'{} {}.p'.format(species, 'Higher-Lower Pleasures')), 'wb'))         
     
     # Undiluted Experience
     ue_lower = model_results['Undiluted Experience'].loc[species]['5th-pct']
     ue_upper = model_results['Undiluted Experience'].loc[species]['95th-pct']
+    ue_dist = sq.lognorm(ue_lower, ue_upper, lclip=0)
+    ue_smples = sq.sample(ue_dist, n=NUM_SCENARIOS)
+    pickle.dump(ue_smples, open(os.path.join(output_dir_adj2,'{} {}.p'.format(species, 'Undiluted Experience')), 'wb'))       
 
     mix = sq.mixture([sq.uniform(neuron_count, neuron_count), sq.norm(qual_lower, qual_upper, lclip=0), sq.norm(ss_hc_lower, ss_hc_upper, lclip=0), \
         sq.norm(cubic_lower, cubic_upper, lclip=0), sq.norm(hc_cubic_lower, hc_cubic_upper, lclip=0), \
@@ -348,11 +376,12 @@ def mixture_one_species_with_neuron_count(model_results, species, wts, neuron_co
         sq.norm(hlp_lower, hlp_upper, lclip=0), sq.lognorm(ue_lower, ue_upper, lclip=0)], weights = wts) 
 
     dist = sq.sample(mix, n=NUM_SCENARIOS)
+    pickle.dump(dist, open(os.path.join(output_dir_adj2,'{} {}.p'.format(species, 'Mixture Neuron Count')), 'wb'))           
     pickle.dump(dist, open(os.path.join('welfare_range_estimates', '{}_wr_Mixture Neuron Count_model.p'.format(species)), 'wb'))
-
+    
     return dist
 
-def all_species_mixture_with_neuron_counts(model_results, weights, SPECIES, neuron_counts, NUM_SCENARIOS, SCENARIO_RANGES ):
+def all_species_mixture_with_neuron_counts(model_results, weights, SPECIES, neuron_counts, NUM_SCENARIOS, SCENARIO_RANGES, output_dir_adj2 ):
     fifth_percentiles = []
     medians = []
     ninty_fifth_percentiles = []
@@ -362,7 +391,7 @@ def all_species_mixture_with_neuron_counts(model_results, weights, SPECIES, neur
     'Higher-Lower Pleasures': weights[7], 'Undiluted Experience': weights[8]}
 
     for species in SPECIES: 
-        mix_species = mixture_one_species_with_neuron_count(model_results, species, weights, neuron_counts, NUM_SCENARIOS)
+        mix_species = mixture_one_species_with_neuron_count(model_results, species, weights, neuron_counts, NUM_SCENARIOS,output_dir_adj2)
         species_stats = one_species_stats(mix_species, SCENARIO_RANGES)
         fifth_percentiles.append(round(species_stats[0],3))
         medians.append(round(species_stats[1],3))

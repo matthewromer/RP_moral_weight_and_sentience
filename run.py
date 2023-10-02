@@ -64,6 +64,7 @@ neuron_counts    = neuron_counts_int.to_dict()
 WR_SPECIES = list(dfData.index)
 WR_PARAMS = {'N_SCENARIOS': 10000, 'UPDATE_EVERY': 1000, "WEIGHT_NOS": wr_weight_nos, "HC_WEIGHT": wr_hc_weight}
 output_dir_adj = 'Sent_Adj_WR_Outputs'
+output_dir_adj2 = 'Sent_Adj_WR_Outputs2'
 
 def simulate_scores(species, params, s_or_wr):
     print("### {} ###".format(s_or_wr.upper()))
@@ -629,7 +630,7 @@ mixture = wr_model.all_species_mixture(model_results, [1/8]*8, WR_SPECIES, NUM_S
 
 ## Mixture with Neuron Count
 
-_count = wr_model.all_species_mixture_with_neuron_counts(model_results, [1/9]*9, WR_SPECIES, neuron_counts, NUM_SCENARIOS, SCENARIO_RANGES )
+_count = wr_model.all_species_mixture_with_neuron_counts(model_results, [1/9]*9, WR_SPECIES, neuron_counts, NUM_SCENARIOS, SCENARIO_RANGES,output_dir_adj2)
 
 
 SPECIES2 = ['pigs', 'chickens', 'carp', 'octopuses', 'bees', 'salmon', 'crayfish', 'shrimp',  'crabs', 'bsf', 'silkworms']
