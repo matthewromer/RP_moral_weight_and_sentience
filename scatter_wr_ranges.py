@@ -19,6 +19,6 @@ def scatter_wr_ranges(data1,data2,animal1,animal2,xlims,ylims,a1_mean,a2_mean,\
     plt.show()
     
     if printEn:
-        name = './Plots/%s.png' % title_str
+        name = './Plots/%s_Scatter.png' % title_str
         print(name)
         fig.savefig(name)    

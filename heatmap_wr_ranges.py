@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 
 def heatmap_wr_ranges(data1,data2,animal1,animal2,xlims,ylims,a1_mean,a2_mean,\
-                      correlation_coeff,title_str,text_loc,numBins=20,printEn=False):
+                      correlation_coeff,title_str,text_loc,numBins=20,printEn=False,\
+                      lims = [0, 2]):
     
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(1, 1, 1)
@@ -16,13 +17,13 @@ def heatmap_wr_ranges(data1,data2,animal1,animal2,xlims,ylims,a1_mean,a2_mean,\
     plt.text(text_loc[0],text_loc[1], 'Mean ({}) = {} \nMean ({}) = {} \nCorrelation = {}'.format(animal1,a1_mean,animal2,a2_mean,correlation_coeff))
     cbar = fig.colorbar(h[3], ax=ax)
     cbar.set_label('Density', rotation=270)
-    ax.set_xlim([0, 2])
-    ax.set_ylim([0, 2])
+    ax.set_xlim([lims[0], lims[1]])
+    ax.set_ylim([lims[0], lims[1]])
     plt.title('Welfare Ranges ({})'.format(title_str))
     plt.grid()
     plt.show()
 
     if printEn:
-        name = './Plots/%s.png' % title_str
+        name = './Plots/%s_Heatmap.png' % title_str
         print(name)
         fig.savefig(name)    

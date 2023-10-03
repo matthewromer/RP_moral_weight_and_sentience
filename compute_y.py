@@ -8,9 +8,9 @@ def compute_y(pigMoralWeight,chickenMoralWeight):
     porkConsPerYearKg = 30
     
     pigWeightKg = 65
-    chickenWeightKg = 1.9
+    chickenWeightKg = 2.5
     
-    pigLifespanDays = 183
+    pigLifespanDays = 365
     chickenLifespanDays = 42
     
     y1 = chickenMoralWeight*chickenConsPerYearKg/chickenWeightKg*chickenLifespanDays-\
