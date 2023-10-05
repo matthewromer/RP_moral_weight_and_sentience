@@ -15,7 +15,7 @@ from heatmap_wr_ranges import heatmap_wr_ranges
 from scatter_wr_ranges import scatter_wr_ranges
 from compute_y import compute_y
 import seaborn as sns
-from computeSummaryStatsArr import computeSummaryStatsArr
+from compute_summary_stats_arr import compute_summary_stats_arr
 from adj_wr_correlation import adj_wr_correlation
 
 #Inputs
@@ -41,10 +41,10 @@ plt.rc('xtick', labelsize='x-small')
 plt.rc('ytick', labelsize='x-small')
 mpl.rcParams['figure.dpi'] = 300
 area = 2
-numBins = 100
+num_bins = 100
 xlims = [0,2]
 ylims = [0,2]
-textLoc = [1.05,1.8]
+text_loc = [1.05,1.8]
 my_pal = {"lightsteelblue","lightcoral","thistle","navajowhite"}
 
 # For each species, load the welfare range simulation 
@@ -64,68 +64,68 @@ pig_mean = round(np.mean(data['pigs','Mixture Neuron Count']),4)
 chicken_mean = round(np.mean(data['chickens','Mixture Neuron Count']),4)
 correlation_coeff = round(r[0,1],4)
 
-computeSummaryStatsArr(data['pigs','Mixture Neuron Count'],printEn=True,name="Pigs Mixture Neuron Count")
-computeSummaryStatsArr(data['chickens','Mixture Neuron Count'],printEn=True,name="Chickens Mixture Neuron Count")
+compute_summary_stats_arr(data['pigs','Mixture Neuron Count'],print_en=True,name="Pigs Mixture Neuron Count")
+compute_summary_stats_arr(data['chickens','Mixture Neuron Count'],print_en=True,name="Chickens Mixture Neuron Count")
 
 # Plot uncorrelated reults for pigs vs. chickens 
 scatter_wr_ranges(data['pigs','Mixture Neuron Count'], \
                   data['chickens','Mixture Neuron Count'],\
                   'Pigs','Chickens',xlims,ylims,pig_mean,chicken_mean,\
                   correlation_coeff,'Independent Sampling from Mixture Model',\
-                  textLoc,area=area,printEn=False) 
+                  text_loc,area=area,print_en=False) 
 
 heatmap_wr_ranges(data['pigs','Mixture Neuron Count'], \
                   data['chickens','Mixture Neuron Count'],\
                   'Pigs','Chickens',xlims,ylims,pig_mean,chicken_mean,\
                   correlation_coeff,'Independent Sampling from Mixture Model',\
-                  textLoc,numBins=numBins,printEn=True)
+                  text_loc,num_bins=num_bins,print_en=True)
     
-y1Raw, y2Raw = compute_y(np.array(data['pigs','Mixture Neuron Count']),\
+y1_raw, y2_raw = compute_y(np.array(data['pigs','Mixture Neuron Count']),\
                                  np.array(data['chickens','Mixture Neuron Count']))
     
 
 n = int(num_samples*0.025)
 m = int(num_samples*0.975)-n
 
-indx = sorted(np.argsort(y1Raw)[n:])
-y1Trimmed = y1Raw[indx]
-indx2 = sorted(np.argsort(y1Trimmed)[:m])
-y1Trimmed = y1Trimmed[indx2]
+indx = sorted(np.argsort(y1_raw)[n:])
+y1_trimmed = y1_raw[indx]
+indx2 = sorted(np.argsort(y1_trimmed)[:m])
+y1_trimmed = y1_trimmed[indx2]
 
-indx = sorted(np.argsort(y2Raw)[n:])
-y2Trimmed = y2Raw[indx]
-indx2 = sorted(np.argsort(y1Trimmed)[:m])
-y2Trimmed = y2Trimmed[indx2]
+indx = sorted(np.argsort(y2_raw)[n:])
+y2_trimmed = y2_raw[indx]
+indx2 = sorted(np.argsort(y1_trimmed)[:m])
+y2_trimmed = y2_trimmed[indx2]
 
 
 # Order results and plot paired results 
-dataSort = data
+data_sort = data
 for species in species_list:
     for model in models:
-        dataSort[species,model].sort()
+        data_sort[species,model].sort()
 
-r = np.corrcoef(dataSort['pigs','Mixture Neuron Count'], dataSort['chickens','Mixture Neuron Count'])
-pig_mean = round(np.mean(dataSort['pigs','Mixture Neuron Count']),4)
-chicken_mean = round(np.mean(dataSort['chickens','Mixture Neuron Count']),4)
+r = np.corrcoef(data_sort['pigs','Mixture Neuron Count'], data_sort['chickens','Mixture Neuron Count'])
+pig_mean = round(np.mean(data_sort['pigs','Mixture Neuron Count']),4)
+chicken_mean = round(np.mean(data_sort['chickens','Mixture Neuron Count']),4)
 correlation_coeff = round(r[0,1],4)
 
-computeSummaryStatsArr(dataSort['pigs','Mixture Neuron Count'],printEn=True,name="Pigs Mixture Neuron Count - Ordered")
-computeSummaryStatsArr(dataSort['chickens','Mixture Neuron Count'],printEn=True,name="Chickens Mixture Neuron Count - Ordered")
+compute_summary_stats_arr(data_sort['pigs','Mixture Neuron Count'],print_en=True,name="Pigs Mixture Neuron Count - Ordered")
+compute_summary_stats_arr(data_sort['chickens','Mixture Neuron Count'],print_en=True,name="Chickens Mixture Neuron Count - Ordered")
 
-scatter_wr_ranges(dataSort['pigs','Mixture Neuron Count'], \
-                  dataSort['chickens','Mixture Neuron Count'],\
+scatter_wr_ranges(data_sort['pigs','Mixture Neuron Count'], \
+                  data_sort['chickens','Mixture Neuron Count'],\
                   'Pigs','Chickens',xlims,ylims,pig_mean,chicken_mean,\
                   correlation_coeff,'Sampling from Ordered Data',\
-                  textLoc,area=area,printEn=False) 
+                  text_loc,area=area,print_en=False) 
 
-heatmap_wr_ranges(dataSort['pigs','Mixture Neuron Count'], \
-                  dataSort['chickens','Mixture Neuron Count'],\
+heatmap_wr_ranges(data_sort['pigs','Mixture Neuron Count'], \
+                  data_sort['chickens','Mixture Neuron Count'],\
                   'Pigs','Chickens',xlims,ylims,pig_mean,chicken_mean,\
                   correlation_coeff,'Sampling from Ordered Data',\
-                  textLoc,numBins=numBins,printEn=True)
+                  text_loc,num_bins=num_bins,print_en=True)
     
-y1Ordered, y2Ordered = compute_y(np.array(dataSort['pigs','Mixture Neuron Count']),\
-                                 np.array(dataSort['chickens','Mixture Neuron Count']))
+y1_ordered, y2_ordered = compute_y(np.array(data_sort['pigs','Mixture Neuron Count']),\
+                                 np.array(data_sort['chickens','Mixture Neuron Count']))
 
 
 # Sample from distribution for each welfare model and plot paired results 
@@ -142,30 +142,30 @@ pig_mean = round(np.mean(data_per_model['pigs']),4)
 chicken_mean = round(np.mean(data_per_model['chickens']),4)
 correlation_coeff = round(r[0,1],4)
 
-computeSummaryStatsArr(data_per_model['pigs'],printEn=True,name="Pigs - Paired from Component")
-computeSummaryStatsArr(data_per_model['chickens'],printEn=True,name="Chickens - Paired from Component")
+compute_summary_stats_arr(data_per_model['pigs'],print_en=True,name="Pigs - Paired from Component")
+compute_summary_stats_arr(data_per_model['chickens'],print_en=True,name="Chickens - Paired from Component")
 
 scatter_wr_ranges(data_per_model['pigs'],data_per_model['chickens'],\
                   'Pigs','Chickens',xlims,ylims,pig_mean,chicken_mean,\
                   correlation_coeff,'Paired Sampling from Constituent Models',\
-                  textLoc,area=area,printEn=False)
+                  text_loc,area=area,print_en=False)
 
 heatmap_wr_ranges(data_per_model['pigs'],data_per_model['chickens'],\
                   'Pigs','Chickens',xlims,ylims,pig_mean,chicken_mean,\
                   correlation_coeff,'Paired Sampling from Constituent Models',\
-                  textLoc,numBins=numBins,printEn=True)
+                  text_loc,num_bins=num_bins,print_en=True)
     
 
 chicken_wr = np.array(data_per_model['chickens'])
 pig_wr = np.array(data_per_model['pigs'])
 
-y1Paired, y2Paired = compute_y(np.array(data_per_model['pigs']),np.array(data_per_model['chickens']))
+y1_paired, y2_paired = compute_y(np.array(data_per_model['pigs']),np.array(data_per_model['chickens']))
 
 
 #Results for shifting from chicken to pork (Box Plot)
-boxData = [y1Raw, y1Trimmed, y1Ordered, y1Paired]
+box_data = [y1_raw, y1_trimmed, y1_ordered, y1_paired]
 fig, ax = plt.subplots(figsize = (12,7),dpi=300)
-sns.boxplot(data=boxData, orient='h', ax=ax, showfliers=False, palette=my_pal)
+sns.boxplot(data=box_data, orient='h', ax=ax, showfliers=False, palette=my_pal)
 ax.set_yticks([0, 1, 2, 3])
 ax.set_yticklabels(["Uncorrelated","Trimming\nTop/Bottom 2.5%","Ordering","Generating Samples\nPair-Wise from\nConstituent Models"])               
 ax.set_xlabel("Weighted Days of Suffering Averted")
@@ -173,9 +173,9 @@ ax.set_title("Suffering Averted by Switching from Chicken to Pork")
 fig.savefig('./Plots/Switching_Suffering.png')   
 
 #Results for shifting from chicken to pork (Box Plot)
-boxData = [y2Raw, y2Trimmed, y2Ordered, y2Paired]
+box_data = [y2_raw, y2_trimmed, y2_ordered, y2_paired]
 fig, ax = plt.subplots(figsize = (12,7),dpi=300)
-sns.boxplot(data=boxData, orient='h', ax=ax, showfliers=False, palette=my_pal)
+sns.boxplot(data=box_data, orient='h', ax=ax, showfliers=False, palette=my_pal)
 ax.set_yticks([0, 1, 2, 3])
 ax.set_yticklabels(["Uncorrelated","Trimming\nTop/Bottom 2.5%","Ordering","Generating Samples\nPair-Wise from\nConstituent Models"])               
 ax.set_xlabel("Weighted Days of Suffering Caused")
@@ -203,11 +203,11 @@ pig_mean = round(np.mean(data_per_model['chickens']),4)
 chicken_mean = round(np.mean(data_per_model['carp']),4)
 correlation_coeff = round(r[0,1],4)
 
-textLoc = [3*0.525,3*0.9]
+text_loc = [3*0.525,3*0.9]
 heatmap_wr_ranges(data_per_model['chickens'],data_per_model['carp'],\
                   'Chickens','Carp',xlims,ylims,pig_mean,chicken_mean,\
                   correlation_coeff,'Paired Sampling from Constituent Models - Carp',\
-                  textLoc,numBins=numBins,printEn=True,lims = [0,3])
+                  text_loc,num_bins=num_bins,print_en=True,lims = [0,3])
     
 # For each species, load the p(sentience)-adjusted welfare range simulation 
 # data for each welfare model
@@ -224,13 +224,16 @@ for species in species_list:
     for model in models:
         data_per_model[species].extend(np.random.choice(data[species,model],samples_per_model))
 
+compute_summary_stats_arr(data_per_model['shrimp'],print_en=True,name="Shrimp - Paired from Component")
+
+
 r = np.corrcoef(data_per_model['chickens'], data_per_model['shrimp'])
 pig_mean = round(np.mean(data_per_model['chickens']),4)
 chicken_mean = round(np.mean(data_per_model['shrimp']),4)
 correlation_coeff = round(r[0,1],4)
 
-textLoc = [5*0.525,5*0.9]
+text_loc = [5*0.525,5*0.9]
 heatmap_wr_ranges(data_per_model['chickens'],data_per_model['shrimp'],\
                   'Chickens','Shrimp',xlims,ylims,pig_mean,chicken_mean,\
                   correlation_coeff,'Paired Sampling from Constituent Models - Shrimp',\
-                  textLoc,numBins=numBins,printEn=True,lims = [0,5])    
+                  text_loc,num_bins=num_bins,print_en=True,lims = [0,5])    

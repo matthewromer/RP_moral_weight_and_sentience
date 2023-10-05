@@ -5,13 +5,13 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 
 def heatmap_wr_ranges(data1,data2,animal1,animal2,xlims,ylims,a1_mean,a2_mean,\
-                      correlation_coeff,title_str,text_loc,numBins=20,printEn=False,\
+                      correlation_coeff,title_str,text_loc,num_bins=20,print_en=False,\
                       lims = [0, 2]):
     
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(1, 1, 1)
     ax.set_facecolor('lightgray')
-    h = plt.hist2d(data1, data2, density=True,bins=numBins,norm=mpl.colors.LogNorm(),cmap=mpl.cm.Reds)
+    h = plt.hist2d(data1, data2, density=True,bins=num_bins,norm=mpl.colors.LogNorm(),cmap=mpl.cm.Reds)
     ax.set_xlabel('P(sentience)-Adjusted Welfare Range of {}'.format(animal1))
     ax.set_ylabel('P(sentience)-Adjusted Welfare Range of {}'.format(animal2))
     plt.text(text_loc[0],text_loc[1], 'Mean ({}) = {} \nMean ({}) = {} \nCorrelation = {}'.format(animal1,a1_mean,animal2,a2_mean,correlation_coeff))
@@ -23,7 +23,7 @@ def heatmap_wr_ranges(data1,data2,animal1,animal2,xlims,ylims,a1_mean,a2_mean,\
     plt.grid()
     plt.show()
 
-    if printEn:
+    if print_en:
         name = './Plots/%s_Heatmap.png' % title_str
         print(name)
         fig.savefig(name)    

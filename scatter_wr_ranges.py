@@ -4,7 +4,7 @@
 import matplotlib.pyplot as plt
 
 def scatter_wr_ranges(data1,data2,animal1,animal2,xlims,ylims,a1_mean,a2_mean,\
-                      correlation_coeff,title_str,text_loc,area=5,printEn=False):
+                      correlation_coeff,title_str,text_loc,area=5,print_en=False):
     
     fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(1, 1, 1)
@@ -18,7 +18,7 @@ def scatter_wr_ranges(data1,data2,animal1,animal2,xlims,ylims,a1_mean,a2_mean,\
     plt.grid()
     plt.show()
     
-    if printEn:
+    if print_en:
         name = './Plots/%s_Scatter.png' % title_str
         print(name)
         fig.savefig(name)    
