@@ -11,26 +11,35 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import math
+import random
+import seaborn as sns
 from heatmap_wr_ranges import heatmap_wr_ranges
 from scatter_wr_ranges import scatter_wr_ranges
 from compute_y import compute_y
-import seaborn as sns
 from compute_summary_stats_arr import compute_summary_stats_arr
 from adj_wr_correlation import adj_wr_correlation
+
 
 # Inputs
 output_dir_adj = 'Sent_Adj_WR_Outputs'
 output_dir_unadj = 'Sent_Adj_WR_Outputs2'
-models = ['Qualitative', 'High-Confidence (Simple Scoring)',
+models_full = ['Qualitative', 'High-Confidence (Simple Scoring)',
           'Cubic', 'High-Confidence (Cubic)',
           'Qualitative Minus Social', 'Pleasure-and-pain-centric',
           'Higher-Lower Pleasures', 'Undiluted Experience', 'Neuron Count',
           'Mixture Neuron Count']
 
+models_unadj = ['Qualitative', 'High-Confidence (Simple Scoring)',
+          'Cubic', 'High-Confidence (Cubic)',
+          'Qualitative Minus Social', 'Pleasure-and-pain-centric',
+          'Higher-Lower Pleasures', 'Undiluted Experience', 'Neuron Count']
+
 species_list = ['pigs', 'chickens']
 
 num_samples = 10000
-num_models = len(models)
+num_models_full = len(models_full)
+num_models_unadj = len(models_unadj)
 data = {}
 data_unadj = {}
 
@@ -50,14 +59,14 @@ my_pal = {"lightsteelblue", "lightcoral", "thistle", "navajowhite"}
 # For each species, load the welfare range simulation
 # data for each welfare model
 for species in species_list:
-    for model in models:
+    for model in models_unadj:
         data_unadj[species, model] = pickle.load(open(os.path.join(
             output_dir_unadj, '{} {}.p'.format(species, model)), 'rb'))
 
 # For each species, load the p(sentience)-adjusted welfare range simulation
 # data for each welfare model
 for species in species_list:
-    for model in models:
+    for model in models_full:
         data[species, model] = \
             pickle.load(open(os.path.join(output_dir_adj,
                         '{} {}.p'.format(species, model)), 'rb'))
@@ -106,7 +115,7 @@ y2_trimmed = y2_trimmed[indx2]
 # Order results and plot paired results
 data_sort = data
 for species in species_list:
-    for model in models:
+    for model in models_full:
         data_sort[species, model].sort()
 
 r = np.corrcoef(data_sort['pigs', 'Mixture Neuron Count'],
@@ -139,14 +148,22 @@ y1_ordered, y2_ordered = compute_y(
                     np.array(data_sort['chickens', 'Mixture Neuron Count']))
 
 
+# Determine how many draws to pull from each constituent model
+samp_per_model = math.floor(num_samples/num_models_unadj)
+extra_samp_num = num_samples % num_models_unadj
+draw_nums = []
+draw_nums.extend([samp_per_model]*(9-extra_samp_num))
+draw_nums.extend([samp_per_model+1]*extra_samp_num)
+random.shuffle(draw_nums)
+
 # Sample from distribution for each welfare model and plot paired results
-samples_per_model = int(num_samples/num_models)
 data_per_model = {}
 for species in species_list:
     data_per_model[species] = []
-    for model in models:
+    for i in range(0, num_models_unadj):
+        model = models_unadj[i]
         data_per_model[species].extend(
-            np.random.choice(data_unadj[species, model], samples_per_model))
+            np.random.choice(data_unadj[species, model], draw_nums[i]))
     data_per_model[species] = \
         adj_wr_correlation(species, data_per_model[species], num_samples)
 
@@ -205,9 +222,9 @@ fig.savefig('./Plots/Eating_Both_Suffering.png')
 # data for each welfare model
 species_list = ['chickens', 'carp']
 for species in species_list:
-    for model in models:
-        data[species, model] = \
-            pickle.load(open(os.path.join(output_dir_adj,
+    for model in models_full:
+        data_unadj[species, model] = \
+            pickle.load(open(os.path.join(output_dir_unadj,
                         '{} {}.p'.format(species, model)), 'rb'))
 
 
@@ -215,9 +232,12 @@ for species in species_list:
 data_per_model = {}
 for species in species_list:
     data_per_model[species] = []
-    for model in models:
+    for i in range(0, num_models_unadj):
+        model = models_unadj[i]
         data_per_model[species].extend(
-            np.random.choice(data[species, model], samples_per_model))
+            np.random.choice(data_unadj[species, model], draw_nums[i]))
+    data_per_model[species] = \
+        adj_wr_correlation(species, data_per_model[species], num_samples)
 
 r = np.corrcoef(data_per_model['chickens'], data_per_model['carp'])
 pig_mean = round(np.mean(data_per_model['chickens']), 4)
@@ -235,8 +255,8 @@ heatmap_wr_ranges(data_per_model['chickens'], data_per_model['carp'],
 # data for each welfare model
 species_list = ['chickens', 'shrimp']
 for species in species_list:
-    for model in models:
-        data[species, model] = pickle.load(open(os.path.join(output_dir_adj,
+    for model in models_full:
+        data_unadj[species, model] = pickle.load(open(os.path.join(output_dir_unadj,
                                            '{} {}.p'.format(species, model)),
                                            'rb'))
 
@@ -245,9 +265,12 @@ for species in species_list:
 data_per_model = {}
 for species in species_list:
     data_per_model[species] = []
-    for model in models:
-        data_per_model[species].extend(np.random.choice(
-            data[species, model], samples_per_model))
+    for i in range(0, num_models_unadj):
+        model = models_unadj[i]
+        data_per_model[species].extend(
+            np.random.choice(data_unadj[species, model], draw_nums[i]))
+    data_per_model[species] = \
+        adj_wr_correlation(species, data_per_model[species], num_samples)
 
 compute_summary_stats_arr(data_per_model['shrimp'], print_en=True,
                           name="Shrimp - Paired from Component")
@@ -261,6 +284,6 @@ correlation_coeff = round(r[0, 1], 4)
 text_loc = [5*0.525, 5*0.9]
 heatmap_wr_ranges(data_per_model['chickens'], data_per_model['shrimp'],
                   'Chickens', 'Shrimp', xlims, ylims, pig_mean, chicken_mean,
-                  correlation_coeff, 'Paired Sampling from\
-                  Constituent Models - Shrimp', text_loc,
+                  correlation_coeff, 'Paired Sampling from'\
+                  + ' Constituent Models - Shrimp', text_loc,
                   num_bins=num_bins, print_en=True, lims=[0, 5])
